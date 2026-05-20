@@ -1,33 +1,33 @@
 @echo off
-title Beeshop Print Server - Background Service Install
+title Celebiz Print Server - Background Service Install
 echo ============================================
-echo   Beeshop's Place - Print Server Installer
+echo   Celebiz - Print Server Installer
 echo ============================================
 echo.
 echo Installing print server as background service...
 echo.
 
-mkdir "C:\BeeshopPrint" 2>nul
-copy "%~dp0BeeshopPrint.exe" "C:\BeeshopPrint\BeeshopPrint.exe" /Y >nul
+mkdir "C:\CelebizPrint" 2>nul
+copy "%~dp0CelebizPrint.exe" "C:\CelebizPrint\CelebizPrint.exe" /Y >nul
 
-echo [1/3] Files copied to C:\BeeshopPrint
+echo [1/3] Files copied to C:\CelebizPrint
 echo.
 
 REM Remove old scheduled task if exists
-schtasks /delete /tn "BeeshopPrintServer" /f >nul 2>&1
+schtasks /delete /tn "CelebizPrintServer" /f >nul 2>&1
 
 REM Create scheduled task that runs at system startup (before login)
-schtasks /create /tn "BeeshopPrintServer" /tr "C:\BeeshopPrint\BeeshopPrint.exe" /sc onstart /ru SYSTEM /rl highest /f >nul 2>&1
+schtasks /create /tn "CelebizPrintServer" /tr "C:\CelebizPrint\CelebizPrint.exe" /sc onstart /ru SYSTEM /rl highest /f >nul 2>&1
 
 echo [2/3] Auto-start service created (runs on boot, no window)
 echo.
 
 REM Also create logon task as backup
-schtasks /create /tn "BeeshopPrintServerLogon" /tr "C:\BeeshopPrint\BeeshopPrint.exe" /sc onlogon /rl highest /f >nul 2>&1
+schtasks /create /tn "CelebizPrintServerLogon" /tr "C:\CelebizPrint\CelebizPrint.exe" /sc onlogon /rl highest /f >nul 2>&1
 
 REM Start it now
-taskkill /f /im BeeshopPrint.exe >nul 2>&1
-start "" /min "C:\BeeshopPrint\BeeshopPrint.exe"
+taskkill /f /im CelebizPrint.exe >nul 2>&1
+start "" /min "C:\CelebizPrint\CelebizPrint.exe"
 
 echo [3/3] Print server started!
 echo.

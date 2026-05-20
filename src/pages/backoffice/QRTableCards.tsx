@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Printer, RefreshCw } from 'lucide-react'
 import { createPDF, savePDF } from '../../lib/pdfExport'
 
-const BASE_URL = 'https://beeshop.place'
+const BASE_URL = 'https://celebiz.vercel.app'
 
 interface TableRow {
   id: string
@@ -203,7 +203,7 @@ export default function QRTableCards() {
         doc.text('Scan to check zone prices', x + colW / 2, y + cardH - 12, { align: 'center' })
         doc.setTextColor(156, 163, 175)
         doc.setFontSize(6)
-        doc.text("Beeshop's Place Lounge", x + colW / 2, y + cardH - 5, { align: 'center' })
+        doc.text('Celebiz Lounge', x + colW / 2, y + cardH - 5, { align: 'center' })
 
         // Link label (tiny)
         doc.setTextColor(180, 180, 180)
@@ -355,7 +355,7 @@ export default function QRTableCards() {
                       textTransform: 'uppercase',
                     }}
                   >
-                    Beeshop's Place Lounge
+                    Celebiz Lounge
                   </p>
                 </div>
               </div>

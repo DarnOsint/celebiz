@@ -182,7 +182,7 @@ export default async function handler(req, res) {
   <div class="wrapper">
     <div class="header">
       <p class="statement-label">Account Statement</p>
-      <h1>Beeshop's Place Lounge</h1>
+      <h1>Celebiz Lounge</h1>
       <p>Statement Date: ${statementDate}</p>
     </div>
 
@@ -295,8 +295,8 @@ export default async function handler(req, res) {
     </div>
 
     <div class="footer">
-      <p><strong style="color:#374151">Beeshop's Place Lounge</strong> · Ibadan, Nigeria</p>
-      <p style="margin-top:4px">For queries about this statement, please contact us at <a href="mailto:info@beeshop.place">info@beeshop.place</a> or visit <a href="https://beeshop.place">beeshop.place</a></p>
+      <p><strong style="color:#374151">Celebiz Lounge</strong> · Ibadan, Nigeria</p>
+      <p style="margin-top:4px">For queries about this statement, please contact us at <a href="mailto:info@celebiz.vercel.app">info@celebiz.vercel.app</a> or visit <a href="https://celebiz.vercel.app">celebiz.vercel.app</a></p>
       <p style="margin-top:8px">This is an automatically generated statement. Please do not reply to this email.</p>
     </div>
   </div>
@@ -317,7 +317,7 @@ export default async function handler(req, res) {
       : `Account Statement — Fully Settled · ${debtor.name}`
 
     const { data, error } = await resend.emails.send({
-      from: "Beeshop's Place <reports@beeshop.place>",
+      from: "Celebiz <reports@celebiz.vercel.app>",
       to: recipients,
       subject,
       html,

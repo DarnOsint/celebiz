@@ -87,7 +87,6 @@ export default function StaffPerformanceTab() {
     setLoading(false)
   }, [period])
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     fetchData()
   }, [fetchData])
@@ -129,7 +128,7 @@ export default function StaffPerformanceTab() {
     const ctr = (s: string) => ' '.repeat(Math.max(0, Math.floor((W - s.length) / 2))) + s
     const lines = [
       '',
-      ctr("BEESHOP'S PLACE"),
+      ctr('CELEBIZ'),
       ctr('STAFF PERFORMANCE'),
       div,
       r('Period:', label),

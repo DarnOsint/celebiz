@@ -383,7 +383,7 @@ export default function ZoneMenuView() {
               <UtensilsCrossed size={17} className="text-black" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-white font-bold text-sm leading-tight">Beeshop&apos;s Place</h1>
+              <h1 className="text-white font-bold text-sm leading-tight">Celebiz</h1>
               <p className="text-amber-400 text-xs font-medium truncate">
                 Prices for {zone?.name || 'Zone'}
               </p>

@@ -209,7 +209,7 @@ export default function ReceiptModal({
       // Waiter copy — plain monospace
       const lines = [
         '',
-        centre("BEESHOP'S PLACE"),
+        centre('CELEBIZ'),
         centre('Lounge & Restaurant'),
         centre('-- WAITER COPY --'),
         divider,
@@ -247,7 +247,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
 
     const customerLines = [
       '',
-      centre("BEESHOP'S PLACE"),
+      centre('CELEBIZ'),
       centre('Lounge & Restaurant'),
       divider,
       fmtRow('Ref:', orderRef),
@@ -293,7 +293,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
     <img src="${qrUrl}" width="90" height="90" alt="QR" style="display:block;margin:0 auto;" onload="window._qrLoaded=true" />
     <div class="qr-label">Scan to view your order online</div>
   </div>
-  <div class="footer">Thank you for visiting Beeshop's Place!</div>
+  <div class="footer">Thank you for visiting Celebiz!</div>
 </body>
 </html>`
   }
@@ -432,7 +432,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
               >
                 <div style={{ textAlign: 'center', marginBottom: '8px' }}>
                   <div style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px' }}>
-                    BEESHOP'S PLACE
+                    CELEBIZ
                   </div>
                   <div style={{ fontSize: '11px', marginTop: '2px' }}>Lounge & Restaurant</div>
                   <div style={{ fontSize: '10px', color: '#444', marginTop: '2px' }}>

@@ -1,4 +1,4 @@
 @echo off
-title Beeshop Print Server
+title Celebiz Print Server
 node "%~dp0server.js"
 pause

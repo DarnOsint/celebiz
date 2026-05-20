@@ -161,7 +161,7 @@ export default function StockSummaryTab({ type }: Props) {
     })
     const lines = [
       '',
-      ctr("BEESHOP'S PLACE"),
+      ctr('CELEBIZ'),
       ctr(`${label.toUpperCase()} STOCK REPORT`),
       div,
       row('Date:', fmtDate),

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { getDistance, isInsideGeofence } from '../lib/geo'
 
-// Known coordinates for Beeshop's Place area (Osogbo, Osun State)
+// Known coordinates for Celebiz area (Osogbo, Osun State)
 const VENUE = { lat: 7.350834, lng: 3.84078 }
 const APARTMENT = { lat: 7.349545, lng: 3.83969 }
 

@@ -361,15 +361,15 @@ export default function NetworkPrinters({ onBack }: Props) {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <a
-              href="https://github.com/DarnOsint/beeshops-restaurantos/releases/download/v1.0-print-server/BeeshopPrint.exe"
+              href="https://github.com/DarnOsint/celebiz/releases/download/v1.0-print-server/CelebizPrint.exe"
               className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl py-3 text-sm transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Printer size={16} /> Download BeeshopPrint.exe
+              <Printer size={16} /> Download CelebizPrint.exe
             </a>
             <a
-              href="https://github.com/DarnOsint/beeshops-restaurantos/releases/download/v1.0-print-server/INSTALL_SERVICE.bat"
+              href="https://github.com/DarnOsint/celebiz/releases/download/v1.0-print-server/INSTALL_SERVICE.bat"
               className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl py-3 text-sm transition-colors border border-gray-700"
               target="_blank"
               rel="noopener noreferrer"
@@ -400,12 +400,12 @@ export default function NetworkPrinters({ onBack }: Props) {
             </p>
           </div>
           <a
-            href="https://github.com/DarnOsint/beeshops-restaurantos/releases/download/v1.0-print-server/SETUP_AUTO_OPEN.bat"
+            href="https://github.com/DarnOsint/celebiz/releases/download/v1.0-print-server/SETUP_AUTO_OPEN.bat"
             className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-xl py-3 text-sm transition-colors border border-gray-700 w-full"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Printer size={16} /> Download Auto-Open on Boot (opens beeshop.place on startup)
+            <Printer size={16} /> Download Auto-Open on Boot (opens celebiz.vercel.app on startup)
           </a>
         </div>
 
@@ -417,8 +417,8 @@ export default function NetworkPrinters({ onBack }: Props) {
               Important: Same Network Required
             </p>
             <p className="text-amber-400/80 text-[11px]">
-              The printer must be on the same WiFi as the POS devices (Beeshop's Place 5g). A
-              printer on 192.168.0.x cannot be reached from 192.168.100.x.
+              The printer must be on the same WiFi as the POS devices (Celebiz 5g). A printer on
+              192.168.0.x cannot be reached from 192.168.100.x.
             </p>
           </div>
           <ul className="text-gray-500 text-xs space-y-1.5">
@@ -432,7 +432,7 @@ export default function NetworkPrinters({ onBack }: Props) {
             </li>
             <li>
               <span className="text-white font-medium">Step 3:</span> WiFi settings → connect to
-              "Beeshop's Place 5g"
+              "Celebiz 5g"
             </li>
             <li>
               <span className="text-white font-medium">Step 4:</span> Printer gets new IP on

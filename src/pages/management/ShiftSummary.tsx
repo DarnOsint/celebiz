@@ -243,7 +243,7 @@ export default function ShiftSummary({ shift, onClose, onConfirmClockOut }: Prop
 
     const lines = [
       '',
-      ctr("BEESHOP'S PLACE"),
+      ctr('CELEBIZ'),
       ctr('SHIFT SUMMARY'),
       div,
       row('Staff:', data.staffName),
@@ -363,7 +363,7 @@ export default function ShiftSummary({ shift, onClose, onConfirmClockOut }: Prop
 
           <div ref={printRef} className="px-6 py-5 space-y-6">
             <div className="hidden print:block header">
-              <h1>Beeshop's Place — Shift Summary</h1>
+              <h1>Celebiz — Shift Summary</h1>
               <p className="sub">
                 {data.staffName} · {data.role?.charAt(0).toUpperCase() + data.role?.slice(1)} ·{' '}
                 {fmtDate(data.clockIn)}
@@ -598,7 +598,7 @@ export default function ShiftSummary({ shift, onClose, onConfirmClockOut }: Prop
               </div>
             </div>
             <div className="hidden print:block footer">
-              <p>Beeshop's Place Lounge · Generated {new Date().toLocaleString('en-NG')}</p>
+              <p>Celebiz Lounge · Generated {new Date().toLocaleString('en-NG')}</p>
             </div>
           </div>
 

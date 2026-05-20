@@ -22,9 +22,9 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw-custom.ts',
       manifest: {
-        name: "Beeshop's RestaurantOS",
-        short_name: 'BeeshopOS',
-        description: 'Restaurant management system for Beeshops Place Lounge',
+        name: "Celebiz",
+        short_name: 'CelebizOS',
+        description: 'Restaurant management system for Celebiz Lounge',
         theme_color: '#0F172A',
         background_color: '#0F172A',
         display: 'standalone',

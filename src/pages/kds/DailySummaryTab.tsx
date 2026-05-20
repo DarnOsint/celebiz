@@ -270,7 +270,7 @@ export default function DailySummaryTab({
 
     const lines = [
       '',
-      ctr("BEESHOP'S PLACE"),
+      ctr('CELEBIZ'),
       ctr(`${label} DAILY SUMMARY`),
       div,
       row('Date:', fmtDate),

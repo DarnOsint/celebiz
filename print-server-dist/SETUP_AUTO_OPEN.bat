@@ -1,16 +1,16 @@
 @echo off
 title Beeshop POS - Auto Open Setup
 echo ============================================
-echo   Beeshop's Place - Auto Open on Boot
+echo   Celebiz - Auto Open on Boot
 echo ============================================
 echo.
-echo This will make beeshop.place open automatically
+echo This will make celebiz.vercel.app open automatically
 echo in Chrome every time this computer starts.
 echo.
 
-REM Create startup shortcut for Chrome opening beeshop.place in kiosk mode
+REM Create startup shortcut for Chrome opening celebiz.vercel.app in kiosk mode
 echo Set oWS = WScript.CreateObject("WScript.Shell") > "%TEMP%\bp.vbs"
-echo sLinkFile = oWS.SpecialFolders("Startup") ^& "\BeeshopPOS.lnk" >> "%TEMP%\bp.vbs"
+echo sLinkFile = oWS.SpecialFolders("Startup") ^& "\CelebizPOS.lnk" >> "%TEMP%\bp.vbs"
 echo Set oLink = oWS.CreateShortcut(sLinkFile) >> "%TEMP%\bp.vbs"
 
 REM Try to find Chrome
@@ -22,7 +22,7 @@ if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" (
     echo oLink.TargetPath = "chrome.exe" >> "%TEMP%\bp.vbs"
 )
 
-echo oLink.Arguments = "--start-fullscreen https://beeshop.place" >> "%TEMP%\bp.vbs"
+echo oLink.Arguments = "--start-fullscreen https://celebiz.vercel.app" >> "%TEMP%\bp.vbs"
 echo oLink.WindowStyle = 1 >> "%TEMP%\bp.vbs"
 echo oLink.Save >> "%TEMP%\bp.vbs"
 cscript //nologo "%TEMP%\bp.vbs"
@@ -32,9 +32,9 @@ echo.
 echo [OK] Auto-open shortcut created!
 echo.
 echo When this computer starts, Chrome will automatically
-echo open beeshop.place in full screen.
+echo open celebiz.vercel.app in full screen.
 echo.
-echo To remove: delete "BeeshopPOS" from your Startup folder.
+echo To remove: delete "CelebizPOS" from your Startup folder.
 echo (Press Win+R, type "shell:startup", press Enter)
 echo.
 pause

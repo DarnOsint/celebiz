@@ -36,10 +36,10 @@ self.addEventListener('push', (event: PushEvent) => {
   try {
     payload = event.data.json() as typeof payload
   } catch {
-    payload = { title: "Beeshop's Place", body: event.data.text() }
+    payload = { title: 'Celebiz', body: event.data.text() }
   }
 
-  const title = payload.title || "Beeshop's Place"
+  const title = payload.title || 'Celebiz'
   const options: NotificationOptions & { renotify?: boolean; vibrate?: number[] } = {
     body: payload.body || '',
     icon: '/icons/icon-192.png',

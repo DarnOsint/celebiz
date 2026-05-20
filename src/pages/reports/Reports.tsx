@@ -508,7 +508,7 @@ export default function Reports() {
   const exportCSV = () => {
     if (!report) return
     const rows = [
-      ['BEESHOPS PLACE - ' + report.period.toUpperCase() + ' REPORT'],
+      ['CELEBIZ - ' + report.period.toUpperCase() + ' REPORT'],
       ['Generated:', report.generatedAt],
       [],
       ['REVENUE SUMMARY'],
@@ -553,7 +553,7 @@ export default function Reports() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'beeshops-' + report.period.toLowerCase().replace(/ /g, '-') + '.csv'
+    a.download = 'celebiz-' + report.period.toLowerCase().replace(/ /g, '-') + '.csv'
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -562,7 +562,7 @@ export default function Reports() {
     if (!report) return
     const sheets: Record<string, any[][]> = {
       Summary: [
-        ['BEESHOPS PLACE', report.period],
+        ['CELEBIZ', report.period],
         ['Generated', report.generatedAt],
         [],
         ['Metric', 'Value'],
@@ -604,7 +604,7 @@ export default function Reports() {
       const ws = XLSX.utils.aoa_to_sheet(data)
       XLSX.utils.book_append_sheet(wb, ws, name.slice(0, 31))
     })
-    const fname = `beeshops_${report.period.replace(/\s+/g, '_')}.xlsx`
+    const fname = `celebiz_${report.period.replace(/\s+/g, '_')}.xlsx`
     XLSX.writeFile(wb, fname)
   }
 
@@ -1399,7 +1399,7 @@ export default function Reports() {
                             ' '.repeat(Math.max(0, Math.floor((W - s.length) / 2))) + s
                           const z = [
                             '',
-                            ctr("BEESHOP'S PLACE"),
+                            ctr('CELEBIZ'),
                             ctr('Lounge & Restaurant'),
                             ctr('Z-REPORT — END OF DAY'),
                             div,
@@ -1502,7 +1502,7 @@ export default function Reports() {
                       style={{ fontFamily: 'monospace', fontSize: '13px' }}
                     >
                       <div className="text-center mb-4">
-                        <div className="text-xl font-bold tracking-widest">BEESHOP'S PLACE</div>
+                        <div className="text-xl font-bold tracking-widest">CELEBIZ</div>
                         <div className="text-sm">Lounge & Restaurant</div>
                         <div className="text-xs text-gray-500 mt-1">Z-REPORT — END OF DAY</div>
                         <div className="text-xs text-gray-500">{getPeriodLabel()}</div>
@@ -1629,7 +1629,7 @@ export default function Reports() {
 
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center">
               <p className="text-gray-500 text-xs">
-                Beeshop's Place · {report.period} Report · Generated {report.generatedAt}
+                Celebiz · {report.period} Report · Generated {report.generatedAt}
               </p>
               <p className="text-gray-600 text-xs mt-1">Powered by RestaurantOS</p>
             </div>

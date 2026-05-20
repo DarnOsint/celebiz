@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-const BRAND = "Beeshop's Place Lounge"
+const BRAND = 'Celebiz Lounge'
 const SUBTEXT = 'Restaurant & Bar'
 
 export function createPDF(title: string, subtitle?: string): jsPDF {

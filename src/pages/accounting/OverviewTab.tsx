@@ -334,7 +334,7 @@ export default function OverviewTab({
     })
     const lines = [
       '',
-      ctr("BEESHOP'S PLACE"),
+      ctr('CELEBIZ'),
       ctr('DAILY RECONCILIATION'),
       div,
       row('Date:', fmtDate),

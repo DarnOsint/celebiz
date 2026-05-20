@@ -1,4 +1,4 @@
-// Beeshop's Place — Local Print Server
+// Celebiz — Local Print Server
 // Runs on localhost:6543 on the POS machine
 // Receives ESC/POS bytes from the browser and forwards to printer IP:9100
 // Config: reads printer IP from config.json if present, else uses default
@@ -25,7 +25,7 @@ const PRINTER_IP = config.printer_ip
 const PRINTER_PORT = config.printer_port
 const SERVER_PORT = config.server_port
 
-// CORS headers so beeshop.place can call localhost
+// CORS headers so celebiz.vercel.app can call localhost
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
@@ -72,7 +72,7 @@ function sendViaTCP(data) {
 function sendViaWindows(data) {
   return new Promise((resolve, reject) => {
     try {
-      const tmpFile = path.join(os.tmpdir(), `beeshop_print_${Date.now()}.txt`)
+      const tmpFile = path.join(os.tmpdir(), `celebiz_print_${Date.now()}.txt`)
       fs.writeFileSync(tmpFile, data)
       // Try to find the printer name that matches the IP
       // First try: direct print via Windows 'print' command
@@ -255,7 +255,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(SERVER_PORT, '0.0.0.0', () => {
   console.log('='.repeat(50))
-  console.log("  Beeshop's Place — Print Server")
+  console.log("  Celebiz — Print Server")
   console.log('='.repeat(50))
   console.log(`  Listening on  0.0.0.0:${SERVER_PORT}`)
   console.log(`  Printer IP    ${PRINTER_IP}:${PRINTER_PORT}`)

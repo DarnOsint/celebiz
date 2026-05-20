@@ -1,4 +1,4 @@
-BEESHOP'S PLACE — PRINT SERVER INSTALLATION
+CELEBIZ — PRINT SERVER INSTALLATION
 ============================================
 
 REQUIREMENTS:
@@ -7,10 +7,10 @@ REQUIREMENTS:
 
 INSTALLATION STEPS:
 
-1. Copy this entire folder to: C:\BeeshopPrint\
+1. Copy this entire folder to: C:\CelebizPrint\
 
 2. Open Command Prompt as Administrator and run:
-   cd C:\BeeshopPrint
+   cd C:\CelebizPrint
    node server.js
    
    You should see the startup banner. Leave this window open.
@@ -24,7 +24,7 @@ AUTO-START ON BOOT:
 2. Create a shortcut to start.bat in that folder
    OR for silent start (no window):
    Right-click → New Shortcut
-   Target: wscript.exe "C:\BeeshopPrint\start-silent.vbs" "C:\BeeshopPrint\start.bat"
+   Target: wscript.exe "C:\CelebizPrint\start-silent.vbs" "C:\CelebizPrint\start.bat"
 
 PRINTER SETTINGS:
 - IP: 192.168.0.10

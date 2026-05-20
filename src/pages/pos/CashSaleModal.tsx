@@ -510,7 +510,7 @@ export default function CashSaleModal({ type, menuItems, staffId, onSuccess, onC
 
     const lines = [
       '',
-      centre("BEESHOP'S PLACE"),
+      centre('CELEBIZ'),
       centre('Lounge & Restaurant'),
       divider,
       fmtRow('Ref:', orderRef),
@@ -543,7 +543,7 @@ export default function CashSaleModal({ type, menuItems, staffId, onSuccess, onC
       centre('** PAYMENT CONFIRMED **'),
       '',
       centre('Thank you for visiting'),
-      centre("Beeshop's Place!"),
+      centre('Celebiz!'),
       '',
     ].join('\n')
 
@@ -1020,7 +1020,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                       })
                       const lines = [
                         '',
-                        ctr("BEESHOP'S PLACE"),
+                        ctr('CELEBIZ'),
                         ctr('Lounge & Restaurant'),
                         ctr(isTakeaway ? '** TAKEAWAY BILL **' : '** CASH SALE BILL **'),
                         div,

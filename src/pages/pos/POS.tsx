@@ -1475,7 +1475,7 @@ export default function POS() {
               <Beer size={15} className="text-black" />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-white font-bold text-sm">Beeshops Place</h1>
+              <h1 className="text-white font-bold text-sm">Celebiz</h1>
               <p className="text-gray-400 text-xs">Point of Sale</p>
             </div>
             <span className="sm:hidden text-white font-bold text-sm">POS</span>
@@ -1771,7 +1771,7 @@ export default function POS() {
 
                       const lines: string[] = [
                         '',
-                        ctr("BEESHOP'S PLACE"),
+                        ctr('CELEBIZ'),
                         ctr('SHIFT SUMMARY'),
                         div,
                         row('Waitron:', profile?.full_name || 'Staff'),

@@ -58,7 +58,7 @@ describe('buildReceipt', () => {
 
   it('contains the venue name', () => {
     const text = toText(buildReceipt(makeReceipt()))
-    expect(text).toContain("BEESHOP'S PLACE")
+    expect(text).toContain('CELEBIZ')
   })
 
   it('contains the order reference', () => {

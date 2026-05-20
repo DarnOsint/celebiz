@@ -4,7 +4,7 @@
 // Deploying this Edge Function would cause the report to be sent twice every morning.
 // This file is kept for reference only.
 //
-// Beeshop's Place — Daily Report Edge Function (v3 — verified schema)
+// Celebiz — Daily Report Edge Function (v3 — verified schema)
 // 03:30 UTC = 4:30am WAT | supabase functions deploy daily-report
 // supabase functions schedule daily-report --cron "30 3 * * *"
 // Secrets: RESEND_API_KEY (required), OWNER_EMAIL (optional fallback)
@@ -211,7 +211,7 @@ function buildEmail(dateStr: string, d: Awaited<ReturnType<typeof fetchAll>>) {
 <body style="margin:0;padding:16px;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif">
 <div style="max-width:680px;margin:0 auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)">
   <div style="background:#0f172a;padding:26px 30px">
-    <div style="font-size:21px;font-weight:900;color:#f59e0b">Beeshop's Place</div>
+    <div style="font-size:21px;font-weight:900;color:#f59e0b">Celebiz</div>
     <div style="font-size:13px;color:#94a3b8;margin-top:4px">Daily Trading Summary · ${dateStr}</div>
   </div>
   <div style="padding:26px 30px">
@@ -253,7 +253,7 @@ function buildEmail(dateStr: string, d: Awaited<ReturnType<typeof fetchAll>>) {
 
     <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:11px;color:#94a3b8">
       Auto-generated at 4:30am WAT by RestaurantOS.
-      Full detail at <a href="https://beeshop.place" style="color:#f59e0b;text-decoration:none">beeshop.place</a>.
+      Full detail at <a href="https://celebiz.vercel.app" style="color:#f59e0b;text-decoration:none">celebiz.vercel.app</a>.
     </div>
   </div>
 </div>
@@ -284,7 +284,7 @@ Deno.serve(async () => {
     const res = await fetch('https://api.resend.com/emails',{
       method:'POST',
       headers:{'Authorization':`Bearer ${key}`,'Content-Type':'application/json'},
-      body:JSON.stringify({from:"Beeshop's Place <reports@beeshopsplace.com>",to:recipients,subject,html}),
+      body:JSON.stringify({from:"Celebiz <reports@celebiz.app>",to:recipients,subject,html}),
     })
 
     if (!res.ok) { const err=await res.text(); return new Response(JSON.stringify({ok:false,error:err}),{status:500}) }

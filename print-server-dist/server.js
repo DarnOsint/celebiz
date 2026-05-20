@@ -52,7 +52,7 @@ http.createServer(async (req, res) => {
   res.writeHead(404, CORS); res.end('{}')
 }).listen(SERVER_PORT, '127.0.0.1', () => {
   console.log('╔══════════════════════════════════════════╗')
-  console.log("║   Beeshop's Place — Print Server         ║")
+  console.log("║   Celebiz — Print Server         ║")
   console.log('╠══════════════════════════════════════════╣')
   console.log('║  localhost:' + SERVER_PORT + '  →  ' + PRINTER_IP + ':' + PRINTER_PORT + '  ║')
   console.log('╠══════════════════════════════════════════╣')

@@ -1,7 +1,7 @@
 {
-  "name": "beeshop-print-server",
+  "name": "celebiz-print-server",
   "version": "1.0.0",
-  "description": "Beeshop's Place local thermal print server",
+  "description": "Celebiz local thermal print server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

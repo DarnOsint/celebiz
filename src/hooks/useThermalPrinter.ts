@@ -89,7 +89,7 @@ export function buildReceipt(data: ReceiptData): Uint8Array {
 
   push(cmd.init)
   push(cmd.alignCenter)
-  push(cmd.doubleSize, ...text("BEESHOP'S PLACE\n"), cmd.normalSize)
+  push(cmd.doubleSize, ...text('CELEBIZ\n'), cmd.normalSize)
   push(cmd.bold, ...text('Lounge & Restaurant\n'), cmd.boldOff)
   push(cmd.alignLeft)
   push(text(divider))
@@ -150,7 +150,7 @@ export function buildReceipt(data: ReceiptData): Uint8Array {
   push(text(centre('** PAYMENT CONFIRMED **')))
   push(text('\n'))
   push(text(centre('Thank you for visiting')))
-  push(text(centre("Beeshop's Place")))
+  push(text(centre('Celebiz')))
   push(cmd.feed(4))
   push(cmd.cut)
 

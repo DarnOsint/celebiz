@@ -413,7 +413,7 @@ export default function PayrollTab() {
     const fmt = (n: number) => 'N' + n.toLocaleString()
     const lines = [
       '',
-      ctr("BEESHOP'S PLACE"),
+      ctr('CELEBIZ'),
       ctr('MONTHLY PAYROLL'),
       div,
       r('Month:', monthLabel(month)),

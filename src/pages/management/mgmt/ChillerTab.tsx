@@ -368,7 +368,7 @@ export default function ChillerTab() {
     })
     const lines = [
       '',
-      ctr("BEESHOP'S PLACE"),
+      ctr('CELEBIZ'),
       ctr('BAR CHILLER REPORT'),
       div,
       r('Date:', fmtDate),

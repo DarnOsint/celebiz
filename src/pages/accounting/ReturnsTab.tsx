@@ -114,7 +114,7 @@ export default function ReturnsTab({ dateRange }: Props) {
 
     const lines = [
       '',
-      centre("BEESHOP'S PLACE"),
+      centre('CELEBIZ'),
       centre('Lounge & Restaurant'),
       centre('RETURNS REPORT'),
       divider,
