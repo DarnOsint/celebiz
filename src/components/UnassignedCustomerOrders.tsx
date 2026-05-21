@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { AlertTriangle, UserPlus, Clock } from 'lucide-react'
-import { formatPrice } from '../../lib/currency'
+import { formatPrice } from '../lib/currency'
 
 interface Waitron {
   id: string

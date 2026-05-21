@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { ShoppingCart, Check, X, ChevronDown, ChevronUp, Clock } from 'lucide-react'
 import type { Profile } from '../types'
-import { formatPrice } from '../../lib/currency'
+import { formatPrice } from '../lib/currency'
 
 function useElapsed(since: string | null): string {
   const [elapsed, setElapsed] = useState(0)

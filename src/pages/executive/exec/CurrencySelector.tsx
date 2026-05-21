@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
-import { setActiveCurrency, invalidateCurrencyCache } from '../../lib/currency'
+import { supabase } from '../../../lib/supabase'
+import { setActiveCurrency, invalidateCurrencyCache } from '../../../lib/currency'
 
 export default function CurrencySelector() {
   const [currency, setCurrency] = useState<'SSP' | 'USD'>('SSP')
