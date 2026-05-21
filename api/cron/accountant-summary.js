@@ -308,7 +308,7 @@ export default async function handler(req, res) {
   `, '#ef4444')}
 
   <div style="text-align:center;padding:20px 0 10px;color:#94a3b8;font-size:11px;line-height:1.7;">
-    <div style="font-weight:700;color:#64748b;margin-bottom:4px;">RestaurantOS · Celebiz Lounge</div>
+    <div style="font-weight:700;color:#64748b;margin-bottom:4px;">CelebizOS · Celebiz Lounge</div>
     <div>Trading period: 8:00 AM – 8:00 AM WAT · ${short}</div>
     <div>Generated at ${new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos', hour:'2-digit', minute:'2-digit' })} WAT · <a href="https://celebiz.vercel.app" style="color:#60a5fa;text-decoration:none;">celebiz.vercel.app</a></div>
   </div>
@@ -318,8 +318,8 @@ export default async function handler(req, res) {
 </html>`
 
     const { data: emailData, error: emailError } = await resend.emails.send({
-      from: 'RestaurantOS <reports@celebiz.vercel.app>',
-      to: [process.env.REPORT_EMAIL || 'seventeenkay@proton.me'],
+      from: 'CelebizOS <reports@celebiz.vercel.app>',
+      to: [process.env.REPORT_EMAIL],
       subject: `Accountant Summary ${short} · ${fmt(totalRevenue)} · ${shortfall > 0 ? 'SHORTFALL ' + fmt(shortfall) : shortfall < 0 ? 'SURPLUS ' + fmt(Math.abs(shortfall)) : 'BALANCED'} — Celebiz`,
       html,
     })

@@ -2,10 +2,10 @@
 -- Run in Supabase SQL editor
 
 -- Preview duplicates first:
-SELECT staff_id, date, COUNT(*) as cnt
+SELECT staff_id, clock_in::date, COUNT(*) as cnt
 FROM attendance
 WHERE clock_out IS NULL
-GROUP BY staff_id, date
+GROUP BY staff_id, clock_in::date
 HAVING COUNT(*) > 1;
 
 -- Delete the OLDER duplicate rows, keep the most recent clock_in per staff per day:
@@ -14,7 +14,7 @@ WHERE id IN (
   SELECT id FROM (
     SELECT id,
            ROW_NUMBER() OVER (
-             PARTITION BY staff_id, date
+             PARTITION BY staff_id, clock_in::date
              ORDER BY clock_in DESC  -- keep the most recent
            ) as rn
     FROM attendance
@@ -24,8 +24,8 @@ WHERE id IN (
 );
 
 -- Verify: should return no rows after cleanup
-SELECT staff_id, date, COUNT(*) as cnt
+SELECT staff_id, clock_in::date, COUNT(*) as cnt
 FROM attendance
 WHERE clock_out IS NULL
-GROUP BY staff_id, date
+GROUP BY staff_id, clock_in::date
 HAVING COUNT(*) > 1;

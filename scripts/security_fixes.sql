@@ -7,11 +7,11 @@
 -- Must run as postgres/service role
 
 -- Policy: only owners can write role='owner'
-CREATE POLICY IF NOT EXISTS "only owners can set owner role"
+DROP POLICY IF EXISTS "only owners can set owner role" ON profiles;
+CREATE POLICY "only owners can set owner role"
   ON profiles
   FOR ALL
   USING (
-    -- Allow if current user is owner, OR if the row's role is not 'owner'
     (SELECT role FROM profiles WHERE id = auth.uid()) = 'owner'
     OR role <> 'owner'
   )
@@ -55,29 +55,7 @@ CREATE TRIGGER enforce_daily_payout_limit
 
 
 -- ── Fix 6: Rate-limit customer QR order submissions per table ──
--- Reject if more than 3 customer_orders for same table_id in last 60 seconds
-CREATE OR REPLACE FUNCTION check_customer_order_rate_limit()
-RETURNS TRIGGER AS $$
-DECLARE
-  recent_count integer;
-BEGIN
-  SELECT COUNT(*)
-    INTO recent_count
-    FROM customer_orders
-   WHERE table_id = NEW.table_id
-     AND created_at > NOW() - INTERVAL '60 seconds';
-
-  IF recent_count >= 3 THEN
-    RAISE EXCEPTION 'Too many orders submitted for this table. Please wait a moment.';
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS rate_limit_customer_orders ON customer_orders;
-CREATE TRIGGER rate_limit_customer_orders
-  BEFORE INSERT ON customer_orders
-  FOR EACH ROW EXECUTE FUNCTION check_customer_order_rate_limit();
+-- (skipped: customer_orders table does not exist in this project)
 
 
 -- ── Fix 7: Recalculate total_amount from order_items on order close ──
@@ -93,7 +71,7 @@ BEGIN
       INTO real_total
       FROM order_items
      WHERE order_id = NEW.id
-       AND void_qty IS NULL OR void_qty = 0;
+       AND (void_qty IS NULL OR void_qty = 0);
 
     -- Only override if client total differs by more than ₦1 (floating point tolerance)
     IF ABS(real_total - NEW.total_amount) > 1 THEN

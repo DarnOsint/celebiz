@@ -140,10 +140,7 @@ ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "order_items_all" ON order_items;
 CREATE POLICY "order_items_all" ON order_items FOR ALL USING (true) WITH CHECK (true);
 
--- customer_orders: anon can insert+read own, authenticated can read all
-ALTER TABLE customer_orders ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "customer_orders_all" ON customer_orders;
-CREATE POLICY "customer_orders_all" ON customer_orders FOR ALL USING (true) WITH CHECK (true);
+-- customer_orders: skipped (table does not exist in this project)
 
 -- settings: authenticated only for write, anon can read
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;

@@ -238,7 +238,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <div className="min-w-0">
               <p className="text-white font-bold text-sm truncate">Celebiz</p>
-              <p className="text-gray-400 text-xs">RestaurantOS</p>
+              <p className="text-gray-400 text-xs">CelebizOS</p>
             </div>
           </div>
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">

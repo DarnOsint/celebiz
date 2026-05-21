@@ -42,19 +42,12 @@ const fmtTime = (secs: number) => {
   return m > 0 ? `${m}m ${secs % 60}s` : `${secs}s`
 }
 
-const setOfflineSession = (
-  profile: { id: string; full_name: string; role: string; email?: string; created_at?: string },
-  mode: 'pin' | 'password'
-) => {
+const setOfflineSession = (profile: { id: string }, mode: 'pin' | 'password') => {
   localStorage.setItem(
     'pin_session',
     JSON.stringify({
       id: profile.id,
-      full_name: profile.full_name,
-      role: profile.role,
-      email: profile.email,
       session_type: mode,
-      created_at: profile.created_at,
       logged_in_at: new Date().toISOString(),
     })
   )
@@ -347,10 +340,10 @@ export default function Login() {
       }
     }
 
-    // Normalize PIN storage: if stored as PBKDF2 hash, replace with plaintext
-    // so the server-side RPC can verify it directly next time (faster, no fallback loop)
+    // Normalize PIN storage: if stored as PBKDF2 hash, call server-side RPC
+    // to re-hash using pgcrypto so the RPC can verify it directly next time
     if (profile.pin && profile.pin.startsWith('pbkdf2:')) {
-      void supabase.from('profiles').update({ pin: entered }).eq('id', profile.id)
+      void supabase.rpc('migrate_pin_hash', { staff_id: profile.id, new_pin: entered })
     }
 
     void fetch('https://api.ipify.org?format=json')
@@ -385,16 +378,7 @@ export default function Login() {
     } catch (e) {
       console.warn('cacheCredential(pin) failed', e)
     }
-    setOfflineSession(
-      {
-        id: profile.id,
-        full_name: profile.full_name,
-        role: profile.role as Role,
-        email: profile.email,
-        created_at: new Date().toISOString(),
-      },
-      'pin'
-    )
+    setOfflineSession({ id: profile.id }, 'pin')
     setLoading(false)
     window.location.replace('/dashboard')
   }
@@ -595,7 +579,7 @@ export default function Login() {
             </>
           )}
         </div>
-        <p className="text-center text-gray-600 text-sm mt-6">RestaurantOS v1.0 — Celebiz Lounge</p>
+        <p className="text-center text-gray-600 text-sm mt-6">CelebizOS v1.0 — Celebiz Lounge</p>
       </div>
     </div>
   )

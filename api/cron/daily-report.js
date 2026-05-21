@@ -360,7 +360,7 @@ export default async function handler(req, res) {
   `, '#7c3aed') : ''}
 
   <div style="text-align:center;padding:20px 0 10px;color:#94a3b8;font-size:11px;line-height:1.7;">
-    <div style="font-weight:700;color:#64748b;margin-bottom:4px;">RestaurantOS · Celebiz Lounge</div>
+    <div style="font-weight:700;color:#64748b;margin-bottom:4px;">CelebizOS · Celebiz Lounge</div>
     <div>Trading period: 8:00 AM – 8:00 AM WAT · ${short}</div>
     <div>Generated at 4:30 AM WAT · <a href="https://celebiz.vercel.app" style="color:#f59e0b;text-decoration:none;">celebiz.vercel.app</a></div>
   </div>
@@ -370,8 +370,8 @@ export default async function handler(req, res) {
 </html>`
 
     const { data: emailData, error: emailError } = await resend.emails.send({
-      from: 'RestaurantOS <reports@celebiz.vercel.app>',
-      to: [process.env.REPORT_EMAIL || 'seventeenkay@proton.me'],
+      from: 'CelebizOS <reports@celebiz.vercel.app>',
+      to: [process.env.REPORT_EMAIL],
       subject: `Z-Report ${short} · ${fmt(grandTotal)} · ${paid.length} orders — Celebiz`,
       html,
     })

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  VAT_RATE,
+  DEFAULT_VAT_RATE,
   calcVat,
   calcTotal,
   calcChange,
@@ -41,9 +41,9 @@ describe('calcVat', () => {
     expect(calcVat(200)).toBeCloseTo(15)
   })
 
-  it('uses VAT_RATE constant', () => {
-    expect(VAT_RATE).toBe(0.075)
-    expect(calcVat(100)).toBe(100 * VAT_RATE)
+  it('uses DEFAULT_VAT_RATE constant', () => {
+    expect(DEFAULT_VAT_RATE).toBe(0.075)
+    expect(calcVat(100)).toBe(100 * DEFAULT_VAT_RATE)
   })
 })
 

@@ -4,8 +4,12 @@
  */
 
 import type { OrderItem } from '../types'
+import { supabase } from './supabase'
 
-export const VAT_RATE = 0.075 // 7.5% Nigerian VAT
+export const DEFAULT_VAT_RATE = 0.075
+
+let cachedVatRate: number | null = null
+let vatFetchPromise: Promise<number> | null = null
 
 // ─── Basic totals ─────────────────────────────────────────────────────────
 
@@ -13,12 +17,33 @@ export function calcSubtotal(totalAmount: number): number {
   return totalAmount
 }
 
-export function calcVat(subtotal: number): number {
-  return subtotal * VAT_RATE
+export function calcVat(subtotal: number, rate?: number): number {
+  return subtotal * (rate ?? DEFAULT_VAT_RATE)
 }
 
-export function calcTotal(subtotal: number): number {
-  return subtotal + calcVat(subtotal)
+export function calcTotal(subtotal: number, rate?: number): number {
+  return subtotal + calcVat(subtotal, rate)
+}
+
+export async function getVatRate(): Promise<number> {
+  if (cachedVatRate !== null) return cachedVatRate
+  if (vatFetchPromise) return vatFetchPromise
+  vatFetchPromise = (async () => {
+    try {
+      const { data } = await supabase.from('settings').select('value').eq('id', 'vat_rate').single()
+      const rate = data ? Number(data.value) : DEFAULT_VAT_RATE
+      cachedVatRate = isNaN(rate) ? DEFAULT_VAT_RATE : rate
+      return cachedVatRate
+    } catch {
+      return DEFAULT_VAT_RATE
+    }
+  })()
+  return vatFetchPromise
+}
+
+export function clearVatCache() {
+  cachedVatRate = null
+  vatFetchPromise = null
 }
 
 export function calcChange(tendered: number, total: number): number {

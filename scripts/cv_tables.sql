@@ -1,4 +1,4 @@
--- ── RestaurantOS: CV / CCTV tables ──────────────────────────────────────
+-- ── CelebizOS: CV / CCTV tables ───────────────────────────────────────────
 -- Run this in your Supabase SQL editor (once).
 -- Safe to re-run — uses CREATE TABLE IF NOT EXISTS.
 
@@ -53,11 +53,23 @@ CREATE INDEX IF NOT EXISTS idx_cv_till_events_created     ON cv_till_events (cre
 CREATE INDEX IF NOT EXISTS idx_cv_shelf_events_created    ON cv_shelf_events (created_at DESC);
 
 -- ── Enable realtime on all CV tables ──────────────────────────────────────
-ALTER PUBLICATION supabase_realtime ADD TABLE cv_people_counts;
-ALTER PUBLICATION supabase_realtime ADD TABLE cv_alerts;
-ALTER PUBLICATION supabase_realtime ADD TABLE cv_zone_heatmaps;
-ALTER PUBLICATION supabase_realtime ADD TABLE cv_till_events;
-ALTER PUBLICATION supabase_realtime ADD TABLE cv_shelf_events;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='cv_people_counts') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE cv_people_counts;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='cv_alerts') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE cv_alerts;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='cv_zone_heatmaps') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE cv_zone_heatmaps;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='cv_till_events') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE cv_till_events;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='cv_shelf_events') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE cv_shelf_events;
+  END IF;
+END $$;
 
 -- ── RLS: allow service role full access, anon read-only ───────────────────
 ALTER TABLE cv_people_counts  ENABLE ROW LEVEL SECURITY;
@@ -67,15 +79,39 @@ ALTER TABLE cv_till_events    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cv_shelf_events   ENABLE ROW LEVEL SECURITY;
 
 -- Service role bypass (simulator + Pi script write via service role key)
-CREATE POLICY IF NOT EXISTS "service role full access" ON cv_people_counts  FOR ALL USING (auth.role() = 'service_role');
-CREATE POLICY IF NOT EXISTS "service role full access" ON cv_alerts         FOR ALL USING (auth.role() = 'service_role');
-CREATE POLICY IF NOT EXISTS "service role full access" ON cv_zone_heatmaps  FOR ALL USING (auth.role() = 'service_role');
-CREATE POLICY IF NOT EXISTS "service role full access" ON cv_till_events    FOR ALL USING (auth.role() = 'service_role');
-CREATE POLICY IF NOT EXISTS "service role full access" ON cv_shelf_events   FOR ALL USING (auth.role() = 'service_role');
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_people_counts' AND policyname='service role full access') THEN
+    CREATE POLICY "service role full access" ON cv_people_counts FOR ALL USING (auth.role() = 'service_role');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_alerts' AND policyname='service role full access') THEN
+    CREATE POLICY "service role full access" ON cv_alerts FOR ALL USING (auth.role() = 'service_role');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_zone_heatmaps' AND policyname='service role full access') THEN
+    CREATE POLICY "service role full access" ON cv_zone_heatmaps FOR ALL USING (auth.role() = 'service_role');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_till_events' AND policyname='service role full access') THEN
+    CREATE POLICY "service role full access" ON cv_till_events FOR ALL USING (auth.role() = 'service_role');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_shelf_events' AND policyname='service role full access') THEN
+    CREATE POLICY "service role full access" ON cv_shelf_events FOR ALL USING (auth.role() = 'service_role');
+  END IF;
+END $$;
 
 -- Authenticated users can read (for dashboard queries)
-CREATE POLICY IF NOT EXISTS "authenticated read" ON cv_people_counts  FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY IF NOT EXISTS "authenticated read" ON cv_alerts         FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY IF NOT EXISTS "authenticated read" ON cv_zone_heatmaps  FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY IF NOT EXISTS "authenticated read" ON cv_till_events    FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY IF NOT EXISTS "authenticated read" ON cv_shelf_events   FOR SELECT USING (auth.role() = 'authenticated');
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_people_counts' AND policyname='authenticated read') THEN
+    CREATE POLICY "authenticated read" ON cv_people_counts FOR SELECT USING (auth.role() = 'authenticated');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_alerts' AND policyname='authenticated read') THEN
+    CREATE POLICY "authenticated read" ON cv_alerts FOR SELECT USING (auth.role() = 'authenticated');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_zone_heatmaps' AND policyname='authenticated read') THEN
+    CREATE POLICY "authenticated read" ON cv_zone_heatmaps FOR SELECT USING (auth.role() = 'authenticated');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_till_events' AND policyname='authenticated read') THEN
+    CREATE POLICY "authenticated read" ON cv_till_events FOR SELECT USING (auth.role() = 'authenticated');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cv_shelf_events' AND policyname='authenticated read') THEN
+    CREATE POLICY "authenticated read" ON cv_shelf_events FOR SELECT USING (auth.role() = 'authenticated');
+  END IF;
+END $$;

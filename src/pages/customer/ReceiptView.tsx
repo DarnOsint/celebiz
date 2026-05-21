@@ -277,7 +277,7 @@ export default function ReceiptView() {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-gray-950 border-t border-gray-800 py-2 text-center">
-        <p className="text-gray-700 text-xs">Celebiz Lounge · RestaurantOS</p>
+        <p className="text-gray-700 text-xs">Celebiz Lounge · CelebizOS</p>
       </div>
     </div>
   )

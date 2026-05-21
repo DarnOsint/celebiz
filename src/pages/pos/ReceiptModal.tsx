@@ -630,7 +630,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                   <div>Thank you for visiting!</div>
                   <div style={{ color: '#666' }}>Please come again 🙏</div>
                   <div style={{ marginTop: '4px', fontSize: '9px', color: '#888' }}>
-                    Powered by RestaurantOS
+                    Powered by CelebizOS
                   </div>
                 </div>
                 <div style={{ marginTop: '16px' }} />

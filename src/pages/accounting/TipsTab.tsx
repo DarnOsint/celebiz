@@ -188,7 +188,7 @@ export default function TipsTab({ dateRange }: Props) {
         <table><thead><tr>
           <th>Date/Time</th><th>Waitron</th><th>Table</th><th>Order Total</th><th>Received</th><th>Tip</th><th>Status</th>
         </tr></thead><tbody>${detailRows}</tbody></table>
-        <div class="footer">RestaurantOS — Celebiz Lounge</div>
+        <div class="footer">CelebizOS — Celebiz Lounge</div>
       </body></html>
     `
     const win = window.open('', '_blank', 'width=900,height=700')

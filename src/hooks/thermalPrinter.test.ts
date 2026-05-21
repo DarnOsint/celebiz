@@ -142,9 +142,9 @@ describe('buildReceipt', () => {
     expect(text).toContain('Thank you for visiting!')
   })
 
-  it('contains RestaurantOS branding', () => {
+  it('contains CelebizOS branding', () => {
     const text = toText(buildReceipt(makeReceipt()))
-    expect(text).toContain('RestaurantOS')
+    expect(text).toContain('CelebizOS')
   })
 
   it('ends with ESC/POS cut command bytes', () => {

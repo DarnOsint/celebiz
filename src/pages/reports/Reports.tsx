@@ -1631,7 +1631,7 @@ export default function Reports() {
               <p className="text-gray-500 text-xs">
                 Celebiz · {report.period} Report · Generated {report.generatedAt}
               </p>
-              <p className="text-gray-600 text-xs mt-1">Powered by RestaurantOS</p>
+              <p className="text-gray-600 text-xs mt-1">Powered by CelebizOS</p>
             </div>
           </div>
         )}

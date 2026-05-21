@@ -23,8 +23,7 @@
 SELECT 
   full_name, 
   role,
-  CASE WHEN pin NOT LIKE 'pbkdf2:%' AND pin IS NOT NULL THEN 'PLAIN TEXT' ELSE 'HASHED' END as pin_status,
-  CASE WHEN approval_pin NOT LIKE 'pbkdf2:%' AND approval_pin IS NOT NULL THEN 'PLAIN TEXT' ELSE 'HASHED or NULL' END as approval_pin_status
+  CASE WHEN pin NOT LIKE 'pbkdf2:%' AND pin IS NOT NULL THEN 'PLAIN TEXT' ELSE 'HASHED' END as pin_status
 FROM profiles
 WHERE is_active = true
 ORDER BY role, full_name;
