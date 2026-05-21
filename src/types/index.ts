@@ -210,44 +210,6 @@ export interface Setting {
   updated_at: string
 }
 
-// ─── CV / CCTV types ────────────────────────────────────────────────────────
-
-export interface CvAlert {
-  id: string
-  camera_id: string
-  alert_type: string
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  description?: string
-  resolved: boolean
-  created_at: string
-}
-
-export interface CvPeopleCount {
-  id: string
-  occupancy: number
-  created_at: string
-}
-
-export interface CvZoneHeatmap {
-  id: string
-  zone_label: string
-  person_count: number
-  avg_dwell_seconds: number
-  created_at: string
-}
-
-export interface CvTillEvent {
-  id: string
-  alert_type: string
-  created_at: string
-}
-
-export interface CvShelfEvent {
-  id: string
-  alert_level: 'normal' | 'low' | 'critical'
-  created_at: string
-}
-
 export interface SyncStatus {
   status: 'online' | 'offline' | 'syncing' | 'partial'
   pending: number

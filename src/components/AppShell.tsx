@@ -22,7 +22,6 @@ import {
   Menu,
   X,
   BarChart2,
-  Camera,
   ChevronDown,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -38,7 +37,6 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
     { label: 'Dashboard', icon: LayoutDashboard, path: '/executive' },
     { label: 'Reports', icon: TrendingUp, path: '/reports' },
     { label: 'Analytics', icon: BarChart2, path: '/analytics' },
-    { label: 'CV', icon: Camera, path: '/cv' },
     { label: 'Back Office', icon: Settings, path: '/backoffice' },
     { label: 'Month End', icon: CalendarDays, path: '/month-end' },
     { label: 'Rooms', icon: BedDouble, path: '/apartment' },
@@ -47,7 +45,6 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
     { label: 'Dashboard', icon: LayoutDashboard, path: '/management' },
     { label: 'POS', icon: ShoppingBag, path: '/pos' },
     { label: 'Reports', icon: TrendingUp, path: '/reports' },
-    { label: 'CV', icon: Camera, path: '/cv' },
     { label: 'Inventory', icon: Package, path: '/backoffice' },
     { label: 'Month End', icon: CalendarDays, path: '/month-end' },
   ],

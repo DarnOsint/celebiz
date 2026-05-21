@@ -3,18 +3,31 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { HelpTooltip } from '../../components/HelpTooltip'
-import { RefreshCw, Camera } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 import { useVisibilityInterval } from '../../hooks/useVisibilityInterval'
 
 import StatCards from './exec/StatCards'
 import RevenueChart from './exec/RevenueChart'
 import QuickActions from './exec/QuickActions'
 import RecentOrders from './exec/RecentOrders'
-import CctvPanel from './exec/CctvPanel'
 import CurrencySelector from './exec/CurrencySelector'
-
-import type { Stats, TrendDay, CvData } from './exec/types'
 import type { PostgrestFilterBuilder } from '@supabase/postgrest-js'
+
+interface Stats {
+  revenue: number
+  openOrders: number
+  occupiedTables: number
+  totalTables: number
+  occupiedRooms: number
+  totalRooms: number
+  staffOnDuty: number
+  lowStock: number
+}
+interface TrendDay {
+  day: string
+  revenue: number
+  orders: number
+}
 
 function getGreeting() {
   const h = new Date().getHours()
@@ -51,12 +64,6 @@ const HELP_TIPS = [
     title: 'Bank Transfer Details',
     description:
       'Set the venue bank name, account number, and account name. These details appear on the POS payment screen whenever a customer selects Bank Transfer — your waitron can show it to the customer for instant transfer.',
-  },
-  {
-    id: 'exec-cctv',
-    title: 'CCTV Intelligence',
-    description:
-      'Live occupancy, camera alerts by severity, zone heatmaps, till anomalies, and bar shelf warnings — all fed from the CV module on your Raspberry Pi server. Alerts can be resolved directly from this panel. Requires the Pi CV script to be running.',
   },
   {
     id: 'exec-lowstock',
@@ -101,14 +108,6 @@ export default function Executive() {
   const [recentOrders, setRecentOrders] = useState<Record<string, unknown>[]>([])
   const [trendData, setTrendData] = useState<TrendDay[]>([])
   const [loading, setLoading] = useState(true)
-  const [cvTab, setCvTab] = useState(false)
-  const [cvData, setCvData] = useState<CvData>({
-    occupancy: 0,
-    todayAlerts: [],
-    zoneHeatmaps: [],
-    tillEvents: [],
-    shelfAlerts: [],
-  })
 
   const statsRefreshTimer = useRef<number | null>(null)
   const statsRefreshInFlight = useRef(false)
@@ -299,38 +298,6 @@ export default function Executive() {
 
   useVisibilityInterval(() => scheduleFetchStats(15000), 60_000, [scheduleFetchStats])
 
-  useEffect(() => {
-    if (!cvTab) return
-    if (!isVisible()) return
-    fetchCvData()
-    const cvCh = supabase
-      .channel('cv-realtime')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'cv_alerts' },
-        () => void fetchCvData()
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'cv_people_counts' },
-        () => void fetchCvData()
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'cv_till_events' },
-        () => void fetchCvData()
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'cv_shelf_events' },
-        () => void fetchCvData()
-      )
-      .subscribe()
-    return () => {
-      supabase.removeChannel(cvCh)
-    }
-  }, [cvTab, fetchCvData])
-
   const peakHour = (() => {
     const hourMap: Record<number, number> = {}
     recentOrders.forEach((o) => {
@@ -363,12 +330,6 @@ export default function Executive() {
         </div>
         <div className="flex items-center gap-2">
           <HelpTooltip storageKey="executive" tips={HELP_TIPS} />
-          <button
-            onClick={() => setCvTab((v) => !v)}
-            className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border transition-colors ${cvTab ? 'bg-purple-500/20 border-purple-500/40 text-purple-400' : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'}`}
-          >
-            <Camera size={13} /> CCTV
-          </button>
           <button onClick={fetchStats} className="text-gray-400 hover:text-white">
             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -376,8 +337,6 @@ export default function Executive() {
       </div>
 
       <div className="p-4 md:p-6">
-        {cvTab && <CctvPanel cvData={cvData} onResolve={resolveAlert} />}
-
         <CurrencySelector />
         <StatCards stats={stats} />
         <RevenueChart trendData={trendData} />
