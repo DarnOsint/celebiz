@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useState } from 'react'
 import type { PayoutRow, PayoutForm } from './types'
 import { useToast } from '../../context/ToastContext'
+import { formatPrice } from '../../lib/currency'
 
 interface Props {
   payouts: PayoutRow[]
@@ -58,9 +59,7 @@ export default function PayoutsTab({ payouts, totalPayouts, onRefresh }: Props) 
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-400 text-sm">Total expenses this period</p>
-          <p className="text-red-400 font-bold text-xl break-all">
-            ₦{totalPayouts.toLocaleString()}
-          </p>
+          <p className="text-red-400 font-bold text-xl break-all">{formatPrice(totalPayouts)}</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -113,7 +112,7 @@ export default function PayoutsTab({ payouts, totalPayouts, onRefresh }: Props) 
                     </div>
                   </div>
                   <p className="text-red-400 font-bold text-lg">
-                    ₦{payout.amount?.toLocaleString()}
+                    {formatPrice(payout.amount || 0)}
                   </p>
                 </div>
               ))}
@@ -156,7 +155,7 @@ export default function PayoutsTab({ payouts, totalPayouts, onRefresh }: Props) 
               </div>
               <div>
                 <label className="text-gray-400 text-xs uppercase tracking-wide block mb-1">
-                  Amount (₦) *
+                  Amount (SSP) *
                 </label>
                 <input
                   type="number"

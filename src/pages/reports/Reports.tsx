@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { createPDF, addTable, savePDF } from '../../lib/pdfExport'
 import { supabase } from '../../lib/supabase'
+import { formatPrice, getCurrencySymbol } from '../../lib/currency'
 import { HelpTooltip } from '../../components/HelpTooltip'
 import { useAuth } from '../../context/AuthContext'
 import {
@@ -512,41 +513,35 @@ export default function Reports() {
       ['Generated:', report.generatedAt],
       [],
       ['REVENUE SUMMARY'],
-      ['Gross Revenue (F&B)', '₦' + report.grossRevenue.toLocaleString()],
-      ['Room Revenue', '₦' + report.roomRevenue.toLocaleString()],
-      ['Total Revenue', '₦' + report.totalRevenue.toLocaleString()],
-      ['Total Expenses', '₦' + report.totalExpenses.toLocaleString()],
-      ['Net Revenue', '₦' + report.netRevenue.toLocaleString()],
+      ['Gross Revenue (F&B)', formatPrice(report.grossRevenue)],
+      ['Room Revenue', formatPrice(report.roomRevenue)],
+      ['Total Revenue', formatPrice(report.totalRevenue)],
+      ['Total Expenses', formatPrice(report.totalExpenses)],
+      ['Net Revenue', formatPrice(report.netRevenue)],
       [],
       ['ORDERS'],
       ['Total Orders', report.totalOrders],
       ['Paid Orders', report.paidOrdersCount],
       ['Cancelled Orders', report.cancelledOrders],
       ['Returned Items', report.returnedItems],
-      ['Return Value', '₦' + report.returnedValue.toLocaleString()],
-      ['Avg Order Value', '₦' + report.avgOrderValue.toLocaleString()],
+      ['Return Value', formatPrice(report.returnedValue)],
+      ['Avg Order Value', formatPrice(report.avgOrderValue)],
       [],
       ['PAYMENT METHODS'],
       ...Object.entries(report.byPayment)
         .filter(([, v]) => v > 0)
-        .map(([k, v]) => [k, '₦' + v.toLocaleString()]),
+        .map(([k, v]) => [k, formatPrice(v)]),
       [],
       ['ITEMS SOLD'],
       ['Item', 'Qty Sold', 'Returned', 'Return Rate', 'Revenue'],
       ...report.topItems.map((i) => {
         const rate = i.quantity > 0 ? Math.round((i.returned / i.quantity) * 100) : 0
-        return [
-          i.name,
-          i.quantity,
-          i.returned,
-          rate > 0 ? `${rate}%` : '–',
-          '₦' + i.revenue.toLocaleString(),
-        ]
+        return [i.name, i.quantity, i.returned, rate > 0 ? `${rate}%` : '–', formatPrice(i.revenue)]
       }),
       [],
       ['STAFF PERFORMANCE'],
       ['Staff', 'Orders', 'Revenue'],
-      ...report.staffPerformance.map((s) => [s.name, s.orders, '₦' + s.revenue.toLocaleString()]),
+      ...report.staffPerformance.map((s) => [s.name, s.orders, formatPrice(s.revenue)]),
     ]
     const csv = rows.map((r) => r.join(',')).join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
@@ -624,13 +619,13 @@ export default function Reports() {
       doc,
       ['Metric', 'Value'],
       [
-        ['Gross Revenue', '₦' + r.grossRevenue.toLocaleString()],
-        ['Room Revenue', '₦' + r.roomRevenue.toLocaleString()],
-        ['Total Expenses', '₦' + r.totalExpenses.toLocaleString()],
-        ['Net Revenue', '₦' + r.netRevenue.toLocaleString()],
+        ['Gross Revenue', formatPrice(r.grossRevenue)],
+        ['Room Revenue', formatPrice(r.roomRevenue)],
+        ['Total Expenses', formatPrice(r.totalExpenses)],
+        ['Net Revenue', formatPrice(r.netRevenue)],
         ['Total Orders', String(r.totalOrders)],
         ['Paid Orders', String(r.paidOrdersCount)],
-        ['Avg Order Value', '₦' + r.avgOrderValue.toLocaleString()],
+        ['Avg Order Value', formatPrice(r.avgOrderValue)],
       ],
       y + 2
     )
@@ -639,7 +634,7 @@ export default function Reports() {
       addTable(
         doc,
         ['Item', 'Qty', 'Revenue'],
-        r.topItems.map((i) => [i.name, String(i.quantity), '₦' + i.revenue.toLocaleString()]),
+        r.topItems.map((i) => [i.name, String(i.quantity), formatPrice(i.revenue)]),
         y + 2
       )
     }
@@ -815,7 +810,7 @@ export default function Reports() {
                 </div>
                 <div className="text-right">
                   <p className="text-white font-bold text-3xl">
-                    ₦{report.totalRevenue.toLocaleString()}
+                    {formatPrice(report.totalRevenue)}
                   </p>
                   <p className="text-gray-400 text-sm">Total Revenue</p>
                   <button
@@ -839,25 +834,25 @@ export default function Reports() {
                 [
                   {
                     label: 'Gross F&B Revenue',
-                    value: '₦' + report.grossRevenue.toLocaleString(),
+                    value: formatPrice(report.grossRevenue),
                     color: 'text-amber-400',
                     icon: TrendingUp,
                   },
                   {
                     label: 'Room Revenue',
-                    value: '₦' + report.roomRevenue.toLocaleString(),
+                    value: formatPrice(report.roomRevenue),
                     color: 'text-blue-400',
                     icon: Home,
                   },
                   {
                     label: 'Total Expenses',
-                    value: '₦' + report.totalExpenses.toLocaleString(),
+                    value: formatPrice(report.totalExpenses),
                     color: 'text-red-400',
                     icon: Banknote,
                   },
                   {
                     label: 'Net Revenue',
-                    value: '₦' + report.netRevenue.toLocaleString(),
+                    value: formatPrice(report.netRevenue),
                     color: 'text-green-400',
                     icon: TrendingUp,
                   },
@@ -881,13 +876,13 @@ export default function Reports() {
                   },
                   {
                     label: 'Returned Items',
-                    value: `${report.returnedItems} (₦${report.returnedValue.toLocaleString()})`,
+                    value: `${report.returnedItems} (${formatPrice(report.returnedValue)})`,
                     color: 'text-orange-400',
                     icon: ShoppingBag,
                   },
                   {
                     label: 'Avg Order Value',
-                    value: '₦' + report.avgOrderValue.toLocaleString(),
+                    value: formatPrice(report.avgOrderValue),
                     color: 'text-purple-400',
                     icon: BarChart2,
                   },
@@ -901,7 +896,7 @@ export default function Reports() {
                     label: 'Revenue / Cover',
                     value:
                       report.revenuePerCover > 0
-                        ? '₦' + Math.round(report.revenuePerCover).toLocaleString()
+                        ? formatPrice(Math.round(report.revenuePerCover))
                         : '—',
                     color: 'text-amber-400',
                     icon: Users,
@@ -944,7 +939,7 @@ export default function Reports() {
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-gray-400">{item.label}</span>
                           <span className="text-white font-medium">
-                            ₦{item.value.toLocaleString()} (
+                            {formatPrice(item.value)} (
                             {report.grossRevenue
                               ? Math.round((item.value / report.grossRevenue) * 100)
                               : 0}
@@ -1026,7 +1021,9 @@ export default function Reports() {
                     <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 10 }} />
                     <YAxis
                       tick={{ fill: '#6b7280', fontSize: 10 }}
-                      tickFormatter={(v: number) => 'NGN' + (v / 1000).toFixed(0) + 'k'}
+                      tickFormatter={(v: number) =>
+                        getCurrencySymbol() + (v / 1000).toFixed(0) + 'k'
+                      }
                     />
                     <Tooltip
                       contentStyle={{
@@ -1034,7 +1031,7 @@ export default function Reports() {
                         border: '1px solid #374151',
                         borderRadius: '8px',
                       }}
-                      formatter={(v: number) => ['₦' + v.toLocaleString(), 'Revenue']}
+                      formatter={(v: number) => [formatPrice(v), 'Revenue']}
                     />
                     <Bar dataKey="revenue" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -1064,7 +1061,7 @@ export default function Reports() {
                         ))}
                       </Pie>
                       <Tooltip
-                        formatter={(v: number) => ['₦' + v.toLocaleString(), 'Revenue']}
+                        formatter={(v: number) => [formatPrice(v), 'Revenue']}
                         contentStyle={{
                           background: '#111827',
                           border: '1px solid #374151',
@@ -1107,7 +1104,7 @@ export default function Reports() {
                           <span className="text-gray-600 text-xs">{cat.quantity} sold</span>
                         </div>
                         <span className="text-white font-medium text-sm">
-                          ₦{cat.revenue.toLocaleString()}
+                          {formatPrice(cat.revenue)}
                         </span>
                       </div>
                     ))}
@@ -1165,7 +1162,7 @@ export default function Reports() {
                               {returnRate}%
                             </td>
                             <td className="px-3 py-2.5 text-right text-white text-sm">
-                              ₦{item.revenue.toLocaleString()}
+                              {formatPrice(item.revenue)}
                             </td>
                           </tr>
                         )
@@ -1210,10 +1207,10 @@ export default function Reports() {
                             {s.orders}
                           </td>
                           <td className="px-3 py-2.5 text-right text-white font-bold text-sm whitespace-nowrap">
-                            ₦{s.revenue.toLocaleString()}
+                            {formatPrice(s.revenue)}
                           </td>
                           <td className="px-3 py-2.5 text-right text-gray-400 text-sm whitespace-nowrap hidden sm:table-cell">
-                            ₦{s.orders ? Math.round(s.revenue / s.orders).toLocaleString() : '0'}
+                            {s.orders ? formatPrice(Math.round(s.revenue / s.orders)) : '0'}
                           </td>
                         </tr>
                       ))}
@@ -1249,7 +1246,7 @@ export default function Reports() {
                             {t.orders}
                           </td>
                           <td className="px-3 py-2.5 text-right text-amber-400 font-bold text-sm whitespace-nowrap">
-                            ₦{t.revenue.toLocaleString()}
+                            {formatPrice(t.revenue)}
                           </td>
                         </tr>
                       ))}
@@ -1272,7 +1269,7 @@ export default function Reports() {
                   <div className="bg-gray-800 rounded-xl p-4">
                     <p className="text-gray-400 text-xs">Revenue</p>
                     <p className="text-amber-400 font-bold text-xl">
-                      ₦{report.roomRevenue.toLocaleString()}
+                      {formatPrice(report.roomRevenue)}
                     </p>
                   </div>
                 </div>
@@ -1289,7 +1286,7 @@ export default function Reports() {
                   <div className="bg-gray-800 rounded-xl p-4">
                     <p className="text-gray-400 text-xs">Outstanding</p>
                     <p className="text-red-400 font-bold text-xl">
-                      ₦{report.totalDebt.toLocaleString()}
+                      {formatPrice(report.totalDebt)}
                     </p>
                   </div>
                 </div>
@@ -1330,7 +1327,7 @@ export default function Reports() {
                             </span>
                           </td>
                           <td className="px-3 py-2.5 text-right text-red-400 font-bold text-sm">
-                            ₦{p.amount?.toLocaleString()}
+                            {formatPrice(p.amount ?? 0)}
                           </td>
                         </tr>
                       ))}
@@ -1339,7 +1336,7 @@ export default function Reports() {
                           Total Expenses
                         </td>
                         <td className="px-3 py-2.5 text-right text-red-400 font-bold">
-                          ₦{report.totalExpenses.toLocaleString()}
+                          {formatPrice(report.totalExpenses)}
                         </td>
                       </tr>
                     </tbody>
@@ -1358,13 +1355,13 @@ export default function Reports() {
                 <div className="bg-gray-800 rounded-xl p-4">
                   <p className="text-gray-400 text-xs">Opening Float</p>
                   <p className="text-blue-400 font-bold text-xl">
-                    ₦{report.totalOpeningFloat.toLocaleString()}
+                    {formatPrice(report.totalOpeningFloat)}
                   </p>
                 </div>
                 <div className="bg-gray-800 rounded-xl p-4">
                   <p className="text-gray-400 text-xs">Closing Float</p>
                   <p className="text-green-400 font-bold text-xl">
-                    ₦{report.totalClosingFloat.toLocaleString()}
+                    {formatPrice(report.totalClosingFloat)}
                   </p>
                 </div>
               </div>
@@ -1412,40 +1409,31 @@ export default function Reports() {
                             row('Cancelled:', String(report.cancelledOrders)),
                             row(
                               'Returned:',
-                              `${report.returnedItems} (N${report.returnedValue.toLocaleString()})`
+                              `${report.returnedItems} (${formatPrice(report.returnedValue)})`
                             ),
-                            row('Gross Revenue:', `N${report.grossRevenue.toLocaleString()}`),
-                            row(
-                              'VAT (7.5%):',
-                              `N${vat.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
-                            ),
-                            row(
-                              'Total incl. VAT:',
-                              `N${totalWithVat.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
-                            ),
+                            row('Gross Revenue:', formatPrice(report.grossRevenue)),
+                            row('VAT (7.5%):', formatPrice(vat)),
+                            row('Total incl. VAT:', formatPrice(totalWithVat)),
                             div,
                             ctr('PAYMENT BREAKDOWN'),
                             div,
-                            row('Cash:', `N${cashTotal.toLocaleString()}`),
-                            row('Bank POS:', `N${report.byPayment.bank_pos.toLocaleString()}`),
-                            row('Transfer:', `N${report.byPayment.transfer.toLocaleString()}`),
-                            row('Credit:', `N${creditTotal.toLocaleString()}`),
-                            row('Split:', `N${report.byPayment.split.toLocaleString()}`),
+                            row('Cash:', formatPrice(cashTotal)),
+                            row('Bank POS:', formatPrice(report.byPayment.bank_pos)),
+                            row('Transfer:', formatPrice(report.byPayment.transfer)),
+                            row('Credit:', formatPrice(creditTotal)),
+                            row('Split:', formatPrice(report.byPayment.split)),
                             div,
                             ctr('RETURNS & DELETIONS'),
                             div,
                             row('Items Returned/Deleted:', String(report.returnedItems)),
-                            row('Value Returned:', `N${report.returnedValue.toLocaleString()}`),
+                            row('Value Returned:', formatPrice(report.returnedValue)),
                             div,
                             ctr('CASH RECONCILIATION'),
                             div,
-                            row('Expected in Drawer:', `N${cashTotal.toLocaleString()}`),
-                            row('Expenses/Payouts:', `N${report.totalExpenses.toLocaleString()}`),
+                            row('Expected in Drawer:', formatPrice(cashTotal)),
+                            row('Expenses/Payouts:', formatPrice(report.totalExpenses)),
                             sol,
-                            row(
-                              'NET CASH:',
-                              `N${(cashTotal - report.totalExpenses).toLocaleString()}`
-                            ),
+                            row('NET CASH:', formatPrice(cashTotal - report.totalExpenses)),
                             sol,
                             div,
                             ctr('STAFF ON SHIFT'),
@@ -1518,18 +1506,11 @@ export default function Reports() {
                           ['Cancelled Orders', report.cancelledOrders],
                           [
                             'Returned Items',
-                            `${report.returnedItems} (₦${report.returnedValue.toLocaleString()})`,
+                            `${report.returnedItems} (${formatPrice(report.returnedValue)})`,
                           ],
-                          ['Gross Revenue', '₦' + report.grossRevenue.toLocaleString()],
-                          [
-                            'VAT Collected (7.5%)',
-                            '₦' + vat.toLocaleString(undefined, { minimumFractionDigits: 2 }),
-                          ],
-                          [
-                            'Total incl. VAT',
-                            '₦' +
-                              totalWithVat.toLocaleString(undefined, { minimumFractionDigits: 2 }),
-                          ],
+                          ['Gross Revenue', formatPrice(report.grossRevenue)],
+                          ['VAT Collected (7.5%)', formatPrice(vat)],
+                          ['Total incl. VAT', formatPrice(totalWithVat)],
                         ] as const
                       ).map(([label, value]) => (
                         <div key={label} className="flex justify-between my-1 text-sm">
@@ -1541,11 +1522,11 @@ export default function Reports() {
                       <div className="font-bold text-xs uppercase mb-2">Payment Breakdown</div>
                       {(
                         [
-                          ['Cash', '₦' + cashTotal.toLocaleString()],
-                          ['Bank POS', '₦' + report.byPayment.bank_pos.toLocaleString()],
-                          ['Bank Transfer', '₦' + report.byPayment.transfer.toLocaleString()],
-                          ['Credit (Pay Later)', '₦' + creditTotal.toLocaleString()],
-                          ['Split Payment', '₦' + report.byPayment.split.toLocaleString()],
+                          ['Cash', formatPrice(cashTotal)],
+                          ['Bank POS', formatPrice(report.byPayment.bank_pos)],
+                          ['Bank Transfer', formatPrice(report.byPayment.transfer)],
+                          ['Credit (Pay Later)', formatPrice(creditTotal)],
+                          ['Split Payment', formatPrice(report.byPayment.split)],
                         ] as const
                       ).map(([label, value]) => (
                         <div key={label} className="flex justify-between my-1 text-sm">
@@ -1562,7 +1543,7 @@ export default function Reports() {
                       <div className="flex justify-between my-1 text-sm">
                         <span>Return Value</span>
                         <span className="text-orange-600 font-bold">
-                          ₦{report.returnedValue.toLocaleString()}
+                          {formatPrice(report.returnedValue)}
                         </span>
                       </div>
                       <div className="flex justify-between my-1 text-sm">
@@ -1571,23 +1552,21 @@ export default function Reports() {
                       </div>
                       <div className="flex justify-between my-1 text-sm">
                         <span>Value Voided</span>
-                        <span className="text-red-600 font-bold">
-                          ₦{totalVoids.toLocaleString()}
-                        </span>
+                        <span className="text-red-600 font-bold">{formatPrice(totalVoids)}</span>
                       </div>
                       <div className="border-t border-dashed border-gray-400 my-3" />
                       <div className="font-bold text-xs uppercase mb-2">Cash Reconciliation</div>
                       <div className="flex justify-between my-1 text-sm">
                         <span>Expected in Drawer</span>
-                        <span className="font-bold">₦{cashTotal.toLocaleString()}</span>
+                        <span className="font-bold">{formatPrice(cashTotal)}</span>
                       </div>
                       <div className="flex justify-between my-1 text-sm">
                         <span>Expenses/Payouts</span>
-                        <span>₦{report.totalExpenses.toLocaleString()}</span>
+                        <span>{formatPrice(report.totalExpenses)}</span>
                       </div>
                       <div className="flex justify-between my-1 text-sm font-bold border-t border-gray-300 pt-1 mt-1">
                         <span>Net Cash</span>
-                        <span>₦{(cashTotal - report.totalExpenses).toLocaleString()}</span>
+                        <span>{formatPrice(cashTotal - report.totalExpenses)}</span>
                       </div>
                       <div className="border-t border-dashed border-gray-400 my-3" />
                       <div className="font-bold text-xs uppercase mb-2">Staff on Shift</div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabase'
+import { formatPrice } from '../../../lib/currency'
 import { Search, Download, RefreshCw } from 'lucide-react'
 
 interface LogEntry {
@@ -54,10 +55,10 @@ function EntryDetail({ entry }: { entry: LogEntry }) {
   if (entry.entity_name) parts.push(entry.entity_name)
   if (entry.new_value) {
     const nv = entry.new_value
-    if (typeof nv.total === 'number') parts.push(`₦${Number(nv.total).toLocaleString()}`)
+    if (typeof nv.total === 'number') parts.push(formatPrice(Number(nv.total)))
     if (typeof nv.payment_method === 'string') parts.push(String(nv.payment_method).toUpperCase())
     if (typeof nv.addedItems === 'number') parts.push(`+${nv.addedItems} items`)
-    if (typeof nv.amount === 'number') parts.push(`₦${Number(nv.amount).toLocaleString()}`)
+    if (typeof nv.amount === 'number') parts.push(formatPrice(Number(nv.amount)))
     if (typeof nv.device === 'string') parts.push(`via ${nv.device}`)
   }
   if (!parts.length) return null

@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
-import { useGeofence } from '../../hooks/useGeofence'
-import GeofenceBlock from '../../components/GeofenceBlock'
 import {
   LogOut,
   BedDouble,
@@ -108,7 +106,6 @@ const APARTMENT_HELP_TIPS = [
 
 export default function ApartmentDashboard() {
   const { profile, signOut } = useAuth()
-  const { status: geoStatus, distance: geoDist, location: geoLocation } = useGeofence('apartment')
   const toast = useToast()
 
   const [tab, setTab] = useState<string>('rooms')
@@ -406,9 +403,6 @@ export default function ApartmentDashboard() {
     d.setDate(d.getDate() + days)
     setCalStart(d)
   }
-
-  if (geoStatus === 'outside')
-    return <GeofenceBlock status={geoStatus} distance={geoDist} location={geoLocation} />
 
   return (
     <div className="min-h-screen bg-gray-950 text-white pb-24">

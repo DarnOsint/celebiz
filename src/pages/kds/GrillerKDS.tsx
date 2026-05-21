@@ -3,8 +3,6 @@ import { supabase } from '../../lib/supabase'
 import { sendPushToStaff } from '../../hooks/usePushNotifications'
 import { audit } from '../../lib/audit'
 import { HelpTooltip } from '../../components/HelpTooltip'
-import { useGeofence } from '../../hooks/useGeofence'
-import GeofenceBlock from '../../components/GeofenceBlock'
 import { useAuth } from '../../context/AuthContext'
 import ErrorBoundary from '../../components/ErrorBoundary'
 import {
@@ -21,6 +19,7 @@ import {
 import type { GrillerTicket, GrillerItem } from './types'
 import { useToast } from '../../context/ToastContext'
 import DailySummaryTab from './DailySummaryTab'
+import { formatPrice } from '../../lib/currency'
 
 const HELP_TIPS = [
   {
@@ -251,7 +250,6 @@ function GrillerKDSInner() {
     }
   }
   const toast = useToast()
-  const { status: geoStatus, distance: geoDist, location: geoLocation } = useGeofence('main')
   const [tickets, setTickets] = useState<GrillerTicket[]>([])
   const [loading, setLoading] = useState(true)
   const [completing, setCompleting] = useState<Record<string, boolean>>({})
@@ -628,8 +626,6 @@ function GrillerKDSInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (geoStatus === 'outside')
-    return <GeofenceBlock status={geoStatus} distance={geoDist} location={geoLocation} />
   if (loading)
     return (
       <div className="min-h-full bg-gray-950 flex items-center justify-center">
@@ -832,11 +828,11 @@ function GrillerKDSInner() {
                   Grill Returns — {returnHistory.length} total
                 </p>
                 <p className="text-gray-400 text-xs font-bold">
-                  ₦
-                  {returnHistory
-                    .filter((r) => r.status === 'accepted' || r.status === 'bar_accepted')
-                    .reduce((s, r) => s + (r.item_total || 0), 0)
-                    .toLocaleString()}{' '}
+                  {formatPrice(
+                    returnHistory
+                      .filter((r) => r.status === 'accepted' || r.status === 'bar_accepted')
+                      .reduce((s, r) => s + (r.item_total || 0), 0)
+                  )}{' '}
                   accepted
                 </p>
               </div>
@@ -872,9 +868,7 @@ function GrillerKDSInner() {
                       >
                         {r.status === 'bar_accepted' ? 'grill accepted' : r.status}
                       </span>
-                      <p className="text-gray-400 text-xs mt-1">
-                        ₦{(r.item_total || 0).toLocaleString()}
-                      </p>
+                      <p className="text-gray-400 text-xs mt-1">{formatPrice(r.item_total || 0)}</p>
                     </div>
                   </div>
                   {r.return_reason && (

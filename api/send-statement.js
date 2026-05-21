@@ -22,7 +22,7 @@ const OWNER_EMAIL = process.env.REPORT_EMAIL || 'seventeenkay@proton.me'
 const INTERNAL_SECRET = process.env.INTERNAL_API_SECRET || process.env.VITE_INTERNAL_API_SECRET
 
 function fmt(n) {
-  return `₦${Number(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`
+  return `SSP${Number(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`
 }
 
 function ageBucket(dateStr) {
@@ -267,9 +267,9 @@ export default async function handler(req, res) {
         <tr>
           <th>Date</th>
           <th>Description</th>
-          <th style="text-align:right">Charges (₦)</th>
-          <th style="text-align:right">Payments (₦)</th>
-          <th style="text-align:right">Balance (₦)</th>
+          <th style="text-align:right">Charges (SSP)</th>
+          <th style="text-align:right">Payments (SSP)</th>
+          <th style="text-align:right">Balance (SSP)</th>
         </tr>
         ${ledgerWithBalance.map(row => `
         <tr class="${row.type === 'payment' ? 'payment-row' : ''}">

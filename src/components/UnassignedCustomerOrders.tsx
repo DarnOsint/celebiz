@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { AlertTriangle, UserPlus, Clock } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 
 interface Waitron {
   id: string
@@ -96,8 +97,8 @@ export default function UnassignedCustomerOrders() {
           </div>
           <p className="text-gray-500 text-xs mb-2">
             {(order.items as unknown[])?.length} item
-            {(order.items as unknown[])?.length !== 1 ? 's' : ''} · ₦
-            {(order.total_amount as number)?.toLocaleString()}
+            {(order.items as unknown[])?.length !== 1 ? 's' : ''} ·{' '}
+            {formatPrice((order.total_amount as number) || 0)}
           </p>
           <div className="flex items-center gap-2">
             <UserPlus size={13} className="text-gray-500 shrink-0" />

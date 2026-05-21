@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Users, ChevronDown, ChevronUp, Printer, RefreshCw } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { formatPrice } from '../../lib/currency'
 import { getNetOrderAmount, getValidOrderItemCount, getValidOrderItems } from './orderAmounts'
 
 const todayWAT = () =>
@@ -334,7 +335,7 @@ export default function WaitronOrdersTab() {
     }) =>
       Array.from(bucket.items.entries())
         .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([name, data]) => row(`  ${data.qty}x ${name}`, `N${data.amount.toLocaleString()}`))
+        .map(([name, data]) => row(`  ${data.qty}x ${name}`, formatPrice(data.amount)))
         .join('\n')
 
     const sectionBlocks: string[] = []
@@ -347,7 +348,7 @@ export default function WaitronOrdersTab() {
           const barSections: string[] = [
             STATION_LABELS.bar.toUpperCase(),
             row('  Total Qty:', String(bucket.totalQty)),
-            row('  Total Sales:', `N${bucket.totalAmount.toLocaleString()}`),
+            row('  Total Sales:', formatPrice(bucket.totalAmount)),
           ]
 
           ;(['drinks', 'wine', 'spirits'] as BarBucket[]).forEach((barBucket) => {
@@ -363,7 +364,7 @@ export default function WaitronOrdersTab() {
               ).toUpperCase()
             )
             barSections.push(row('  Qty:', String(barSummary.totalQty)))
-            barSections.push(row('  Sales:', `N${barSummary.totalAmount.toLocaleString()}`))
+            barSections.push(row('  Sales:', formatPrice(barSummary.totalAmount)))
             const lines = renderBucket(barSummary)
             if (lines) barSections.push(lines)
           })
@@ -376,7 +377,7 @@ export default function WaitronOrdersTab() {
           [
             STATION_LABELS[station].toUpperCase(),
             row('  Qty:', String(bucket.totalQty)),
-            row('  Sales:', `N${bucket.totalAmount.toLocaleString()}`),
+            row('  Sales:', formatPrice(bucket.totalAmount)),
             renderBucket(bucket),
           ]
             .filter(Boolean)
@@ -393,14 +394,14 @@ export default function WaitronOrdersTab() {
       row('Waitron:', selectedShift.staff_name),
       row('Date:', fmtDate),
       row('Orders:', String(orders.length)),
-      row('Total Sales:', `N${totalSales.toLocaleString()}`),
+      row('Total Sales:', formatPrice(totalSales)),
       row('Total Items:', String(totalItems)),
       div,
       ctr('SUMMARY BY STATION'),
       div,
       ...sectionBlocks.flatMap((block, index) => (index === 0 ? [block] : ['', block])),
       sol,
-      row('TOTAL:', `N${totalSales.toLocaleString()}`),
+      row('TOTAL:', formatPrice(totalSales)),
       sol,
       '',
       ctr('*** END OF REPORT ***'),
@@ -501,9 +502,9 @@ export default function WaitronOrdersTab() {
                   <div>
                     <p className="text-white font-bold">{selectedShift?.staff_name}</p>
                     <p className="text-gray-400 text-xs">
-                      {orders.length} orders · ₦{totalSales.toLocaleString()} · {totalItems} items
+                      {orders.length} orders · {formatPrice(totalSales)} · {totalItems} items
                       {orders.length > 0
-                        ? ` (paid ₦${paidSales.toLocaleString()} · open ₦${openSales.toLocaleString()})`
+                        ? ` (paid ${formatPrice(paidSales)} · open ${formatPrice(openSales)})`
                         : ''}
                     </p>
                   </div>
@@ -565,7 +566,7 @@ export default function WaitronOrdersTab() {
                             </div>
                             <div className="text-right">
                               <p className="text-amber-400 font-bold text-sm">
-                                ₦{getNetOrderAmount(o).toLocaleString()}
+                                {formatPrice(getNetOrderAmount(o))}
                               </p>
                               <p className="text-gray-500 text-[10px]">
                                 {new Date(o.closed_at || o.created_at).toLocaleTimeString('en-NG', {
@@ -589,7 +590,7 @@ export default function WaitronOrdersTab() {
                                       {item.menu_items?.name || item.modifier_notes || 'Item'}
                                     </td>
                                     <td className="text-gray-400 py-0.5 text-right pl-2">
-                                      ₦{(item.total_price || 0).toLocaleString()}
+                                      {formatPrice(item.total_price || 0)}
                                     </td>
                                   </tr>
                                 ))}

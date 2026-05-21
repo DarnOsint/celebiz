@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { RefreshCw, Printer } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
+import { formatPrice } from '../../../lib/currency'
 
 interface SaleRow {
   item_name: string
@@ -169,21 +170,21 @@ export default function StationSalesTab({ destination, label }: Props) {
         })
       ),
       r('Total Items:', String(totals.qty)),
-      r('Total Revenue:', `N${totals.revenue.toLocaleString()}`),
+      r('Total Revenue:', formatPrice(totals.revenue)),
       div,
       ctr('BY WAITRON'),
       div,
       ...Object.entries(totals.byWaitron)
         .sort((a, b) => b[1].rev - a[1].rev)
-        .map(([name, v]) => r(name, `${v.qty} items N${v.rev.toLocaleString()}`)),
+        .map(([name, v]) => r(name, `${v.qty} items ${formatPrice(v.rev)}`)),
       div,
       ctr('BY ZONE'),
       div,
       ...Object.entries(totals.byZone)
         .sort((a, b) => b[1] - a[1])
-        .map(([zone, rev]) => r(zone, `N${rev.toLocaleString()}`)),
+        .map(([zone, rev]) => r(zone, formatPrice(rev))),
       sol,
-      r('TOTAL:', `N${totals.revenue.toLocaleString()}`),
+      r('TOTAL:', formatPrice(totals.revenue)),
       sol,
       '',
       ctr('*** END ***'),
@@ -250,7 +251,7 @@ export default function StationSalesTab({ destination, label }: Props) {
           <p className="text-amber-400 text-xs font-bold uppercase tracking-wider">
             {label} Sales Revenue
           </p>
-          <p className="text-white text-2xl font-black mt-1">₦{totals.revenue.toLocaleString()}</p>
+          <p className="text-white text-2xl font-black mt-1">{formatPrice(totals.revenue)}</p>
           <p className="text-gray-400 text-xs">{totals.qty} items given out</p>
           {Object.keys(totals.byZone).length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 pt-3 border-t border-amber-500/20">
@@ -258,7 +259,7 @@ export default function StationSalesTab({ destination, label }: Props) {
                 .sort((a, b) => b[1] - a[1])
                 .map(([zone, rev]) => (
                   <div key={zone} className="text-center">
-                    <p className="text-amber-400 font-bold text-sm">₦{rev.toLocaleString()}</p>
+                    <p className="text-amber-400 font-bold text-sm">{formatPrice(rev)}</p>
                     <p className="text-gray-500 text-[9px] uppercase tracking-wider">{zone}</p>
                   </div>
                 ))}
@@ -280,7 +281,7 @@ export default function StationSalesTab({ destination, label }: Props) {
               >
                 <span className="text-gray-300 text-sm">{name}</span>
                 <span className="text-amber-400 text-sm font-bold">
-                  {v.qty} items · ₦{v.rev.toLocaleString()}
+                  {v.qty} items · {formatPrice(v.rev)}
                 </span>
               </div>
             ))}
@@ -312,9 +313,7 @@ export default function StationSalesTab({ destination, label }: Props) {
                 <tr key={i} className="border-t border-gray-800 hover:bg-gray-800/50">
                   <td className="text-white px-3 py-2 font-medium">{s.item_name}</td>
                   <td className="text-blue-400 text-right px-2 py-2">{s.qty}</td>
-                  <td className="text-amber-400 text-right px-2 py-2">
-                    ₦{s.revenue.toLocaleString()}
-                  </td>
+                  <td className="text-amber-400 text-right px-2 py-2">{formatPrice(s.revenue)}</td>
                   <td className="text-gray-400 px-2 py-2">{s.zone}</td>
                   <td className="text-gray-300 px-2 py-2">{s.waitron}</td>
                   <td className="text-gray-500 px-2 py-2">{s.time}</td>
@@ -326,7 +325,7 @@ export default function StationSalesTab({ destination, label }: Props) {
                 <td className="text-white px-3 py-2">TOTAL</td>
                 <td className="text-blue-400 text-right px-2 py-2">{totals.qty}</td>
                 <td className="text-amber-400 text-right px-2 py-2">
-                  ₦{totals.revenue.toLocaleString()}
+                  {formatPrice(totals.revenue)}
                 </td>
                 <td colSpan={3} className="px-2 py-2"></td>
               </tr>

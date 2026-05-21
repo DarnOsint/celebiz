@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { audit } from '../../lib/audit'
 import { useAuth } from '../../context/AuthContext'
 import { ArrowLeft, Plus, Edit2, X, Save, ToggleLeft, ToggleRight, Search, Tag } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 import { useToast } from '../../context/ToastContext'
 
 interface MenuCategory {
@@ -395,9 +396,7 @@ export default function MenuManagement({ onBack }: Props) {
                         </span>
                       </div>
                       <h3 className="text-white font-medium text-sm truncate">{item.name}</h3>
-                      <p className="text-amber-400 font-bold text-sm">
-                        ₦{item.price.toLocaleString()}
-                      </p>
+                      <p className="text-amber-400 font-bold text-sm">{formatPrice(item.price)}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <button
@@ -498,7 +497,7 @@ export default function MenuManagement({ onBack }: Props) {
                 </div>
                 <div>
                   <label className="text-gray-400 text-xs uppercase tracking-wide block mb-1">
-                    Base Price (₦) *
+                    Base Price (SSP) *
                   </label>
                   <input
                     type="number"

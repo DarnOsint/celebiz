@@ -1,4 +1,5 @@
 import { Search, Eye } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 import type { RoomRow, StayRow, RoomStatus } from './types'
 import { ROOM_STATUSES, STATUS_CONFIG } from './types'
 
@@ -57,7 +58,7 @@ export default function RoomBoardTab({
     { label: 'Maintenance', value: stats.maintenance, color: 'text-red-400' },
     {
       label: 'Revenue Active',
-      value: `₦${(nightRevenue / 1000).toFixed(0)}k`,
+      value: formatPrice(nightRevenue),
       color: 'text-purple-400',
     },
   ]
@@ -126,7 +127,7 @@ export default function RoomBoardTab({
               </div>
 
               <p className="text-amber-400 text-sm font-bold mb-1">
-                ₦{room.rate_per_night?.toLocaleString()}/night
+                {formatPrice(room.rate_per_night || 0)}/night
               </p>
 
               {stay && (

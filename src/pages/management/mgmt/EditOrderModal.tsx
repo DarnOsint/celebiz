@@ -4,6 +4,7 @@ import { supabase } from '../../../lib/supabase'
 import { audit } from '../../../lib/audit'
 import { useAuth } from '../../../context/AuthContext'
 import { useToast } from '../../../context/ToastContext'
+import { formatPrice } from '../../../lib/currency'
 import type { Profile } from '../../../types'
 
 interface OrderItem {
@@ -127,7 +128,7 @@ export default function EditOrderModal({ order, onClose, onSaved }: Props) {
       // Note total correction if mismatch
       if (hasTotalMismatch && removedIds.length === 0 && addedItems.length === 0) {
         changes.push(
-          `Total corrected from ₦${storedTotal.toLocaleString()} to ₦${actualItemsTotal.toLocaleString()}`
+          `Total corrected from ${formatPrice(storedTotal)} to ${formatPrice(actualItemsTotal)}`
         )
       }
 
@@ -208,9 +209,9 @@ export default function EditOrderModal({ order, onClose, onSaved }: Props) {
             <div className="mx-4 mt-4 bg-red-500/10 border border-red-500/30 rounded-xl p-3">
               <p className="text-red-400 text-sm font-bold mb-1">Total Mismatch Detected</p>
               <p className="text-red-400/80 text-xs">
-                Stored total is ₦{storedTotal.toLocaleString()} but items only add up to ₦
-                {actualItemsTotal.toLocaleString()}. This usually means items were deleted but the
-                total wasn't updated. Click Save to fix.
+                Stored total is {formatPrice(storedTotal)} but items only add up to{' '}
+                {formatPrice(actualItemsTotal)}. This usually means items were deleted but the total
+                wasn't updated. Click Save to fix.
               </p>
             </div>
           )}
@@ -234,8 +235,8 @@ export default function EditOrderModal({ order, onClose, onSaved }: Props) {
                           'Item'}
                       </p>
                       <p className="text-gray-500 text-xs">
-                        {item.quantity}x ₦{item.unit_price?.toLocaleString()} = ₦
-                        {item.total_price?.toLocaleString()}
+                        {item.quantity}x {formatPrice(item.unit_price)} ={' '}
+                        {formatPrice(item.total_price)}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -280,7 +281,7 @@ export default function EditOrderModal({ order, onClose, onSaved }: Props) {
                         {added.menuItem.name}
                       </p>
                       <p className="text-amber-400/60 text-xs">
-                        ₦{added.menuItem.price.toLocaleString()} each
+                        {formatPrice(added.menuItem.price)} each
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -300,7 +301,7 @@ export default function EditOrderModal({ order, onClose, onSaved }: Props) {
                         <Plus size={12} />
                       </button>
                       <span className="text-amber-400 text-sm font-bold ml-1">
-                        ₦{(added.menuItem.price * added.quantity).toLocaleString()}
+                        {formatPrice(added.menuItem.price * added.quantity)}
                       </span>
                       <button
                         onClick={() => deleteAddedItem(added.tempId)}
@@ -345,7 +346,7 @@ export default function EditOrderModal({ order, onClose, onSaved }: Props) {
                     >
                       <span className="text-gray-300 text-xs">{mi.name}</span>
                       <span className="text-amber-400 text-xs font-bold shrink-0 ml-2">
-                        ₦{mi.price.toLocaleString()}
+                        {formatPrice(mi.price)}
                       </span>
                     </button>
                   ))}
@@ -363,14 +364,14 @@ export default function EditOrderModal({ order, onClose, onSaved }: Props) {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-gray-500 text-xs">Original Total</p>
-              <p className="text-gray-400 text-sm">₦{order.total_amount?.toLocaleString()}</p>
+              <p className="text-gray-400 text-sm">{formatPrice(order.total_amount)}</p>
             </div>
             <div className="text-right">
               <p className="text-gray-500 text-xs">New Total</p>
               <p
                 className={`text-lg font-bold ${newTotal !== order.total_amount ? 'text-amber-400' : 'text-white'}`}
               >
-                ₦{newTotal.toLocaleString()}
+                {formatPrice(newTotal)}
               </p>
             </div>
           </div>

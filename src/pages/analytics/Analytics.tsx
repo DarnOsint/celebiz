@@ -30,6 +30,7 @@ import {
   MapPin,
 } from 'lucide-react'
 import { HelpTooltip } from '../../components/HelpTooltip'
+import { formatPrice, getCurrencySymbol } from '../../lib/currency'
 
 const AMBER = '#f59e0b',
   GREEN = '#10b981',
@@ -221,7 +222,7 @@ export default function Analytics() {
   const [aiError, setAiError] = useState(false)
   const [aiErrorMsg, setAiErrorMsg] = useState('')
   const [data, setData] = useState<AnalyticsData | null>(null)
-  const fmt = (n: number) => '₦' + (n || 0).toLocaleString()
+  const fmt = (n: number) => formatPrice(n)
 
   const processData = useCallback(
     (
@@ -629,10 +630,10 @@ Categories: ${d.categorySplit
                   <XAxis dataKey="day" tick={{ fill: '#6b7280', fontSize: 11 }} />
                   <YAxis
                     tick={{ fill: '#6b7280', fontSize: 11 }}
-                    tickFormatter={(v: number) => '₦' + (v / 1000).toFixed(0) + 'k'}
+                    tickFormatter={(v: number) => `${getCurrencySymbol()}${(v / 1000).toFixed(0)}k`}
                   />
                   <Tooltip
-                    formatter={(v: number) => ['₦' + v.toLocaleString(), 'Revenue']}
+                    formatter={(v: number) => [formatPrice(v), 'Revenue']}
                     contentStyle={{
                       background: '#111827',
                       border: '1px solid #374151',
@@ -681,7 +682,7 @@ Categories: ${d.categorySplit
                     }}
                     labelStyle={{ color: '#f9fafb', fontSize: 12 }}
                     formatter={(value: number, name: string) => [
-                      name === 'revenue' ? `₦${value.toLocaleString()}` : value,
+                      name === 'revenue' ? formatPrice(value) : value,
                       name === 'revenue' ? 'Revenue' : 'Orders',
                     ]}
                   />
@@ -861,7 +862,9 @@ Categories: ${d.categorySplit
                     <XAxis
                       type="number"
                       tick={{ fill: '#6b7280', fontSize: 10 }}
-                      tickFormatter={(v: number) => '₦' + (v / 1000).toFixed(0) + 'k'}
+                      tickFormatter={(v: number) =>
+                        `${getCurrencySymbol()}${(v / 1000).toFixed(0)}k`
+                      }
                     />
                     <YAxis
                       type="category"

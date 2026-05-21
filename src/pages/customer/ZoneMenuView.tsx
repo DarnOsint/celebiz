@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { AlertCircle, RefreshCw, Search, ThumbsDown, ThumbsUp, UtensilsCrossed } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 
 type MenuCategory = { name?: string | null }
 type MenuItem = {
@@ -520,7 +521,7 @@ export default function ZoneMenuView() {
                         {item.name}
                       </p>
                       <p className="text-amber-400 font-bold text-sm mt-1">
-                        ₦{item.price.toLocaleString()}
+                        {formatPrice(item.price)}
                       </p>
                     </div>
                   ))}

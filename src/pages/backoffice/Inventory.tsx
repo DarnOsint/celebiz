@@ -18,6 +18,7 @@ import {
   Clock,
   Trash2,
 } from 'lucide-react'
+import { formatPrice, getCurrencySymbol } from '../../lib/currency'
 import { audit } from '../../lib/audit'
 
 const UNITS = ['bottles', 'crates', 'litres', 'kg', 'packs', 'cartons', 'pieces'] as const
@@ -330,8 +331,8 @@ export default function Inventory({ onBack }: Props) {
           <div>
             <h1 className="text-white font-bold">Drink Inventory & Restocking</h1>
             <p className="text-gray-400 text-xs">
-              {items.length} items · {lowStockCount} low stock · Stock value: ₦
-              {totalStockValue.toLocaleString()}
+              {items.length} items · {lowStockCount} low stock · Stock value: {getCurrencySymbol()}
+              {formatPrice(totalStockValue)}
             </p>
           </div>
         </div>
@@ -397,7 +398,7 @@ export default function Inventory({ onBack }: Props) {
                 },
                 {
                   label: 'Stock Value',
-                  value: `₦${totalStockValue.toLocaleString()}`,
+                  value: formatPrice(totalStockValue),
                   icon: DollarSign,
                   color: 'text-green-400',
                   bg: 'bg-green-400/10',
@@ -488,14 +489,13 @@ export default function Inventory({ onBack }: Props) {
                             </td>
                             <td className="px-4 py-3 text-gray-400 text-sm">{item.unit}</td>
                             <td className="px-4 py-3 text-gray-400 text-sm">
-                              ₦{(item.selling_price || item.cost_price || 0).toLocaleString()}
+                              {formatPrice(item.selling_price || item.cost_price || 0)}
                             </td>
                             <td className="px-4 py-3 text-amber-400 text-sm font-medium">
-                              ₦
-                              {(
+                              {formatPrice(
                                 (item.current_stock || 0) *
-                                (item.selling_price || item.cost_price || 0)
-                              ).toLocaleString()}
+                                  (item.selling_price || item.cost_price || 0)
+                              )}
                             </td>
                             <td className="px-4 py-3">
                               <span className={`text-xs px-2 py-1 rounded-lg ${status.color}`}>
@@ -538,8 +538,8 @@ export default function Inventory({ onBack }: Props) {
             <div className="flex items-center justify-between mb-2">
               <p className="text-gray-400 text-sm">{restockLog.length} restock entries</p>
               <p className="text-gray-500 text-xs">
-                Total spent: ₦
-                {restockLog.reduce((s, r) => s + (r.total_cost || 0), 0).toLocaleString()}
+                Total spent: {getCurrencySymbol()}
+                {formatPrice(restockLog.reduce((s, r) => s + (r.total_cost || 0), 0))}
               </p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -594,7 +594,7 @@ export default function Inventory({ onBack }: Props) {
                     <div className="text-right">
                       <p className="text-green-400 font-bold">+{log.quantity_added} units</p>
                       <p className="text-gray-500 text-xs">
-                        ₦{log.total_cost?.toLocaleString()} total
+                        {formatPrice(log.total_cost || 0)} total
                       </p>
                     </div>
                   </div>
@@ -604,7 +604,7 @@ export default function Inventory({ onBack }: Props) {
                       { label: 'After', value: log.new_stock },
                       {
                         label: 'Cost/Unit',
-                        value: `₦${log.cost_price_per_unit?.toLocaleString()}`,
+                        value: formatPrice(log.cost_price_per_unit || 0),
                       },
                       { label: 'Payment', value: log.payment_method },
                       { label: 'Supplier', value: log.supplier_name || '—' },
@@ -744,7 +744,7 @@ export default function Inventory({ onBack }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-gray-400 text-xs uppercase tracking-wide block mb-1">
-                    Cost Price (₦)
+                    Cost Price (SSP)
                   </label>
                   <input
                     type="number"
@@ -756,7 +756,7 @@ export default function Inventory({ onBack }: Props) {
                 </div>
                 <div>
                   <label className="text-gray-400 text-xs uppercase tracking-wide block mb-1">
-                    Selling Price (₦)
+                    Selling Price (SSP)
                   </label>
                   <input
                     type="number"
@@ -826,7 +826,7 @@ export default function Inventory({ onBack }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-gray-400 text-xs uppercase tracking-wide block mb-1">
-                    Cost/Unit (₦)
+                    Cost/Unit (SSP)
                   </label>
                   <input
                     type="number"
@@ -839,11 +839,10 @@ export default function Inventory({ onBack }: Props) {
                 <div className="bg-gray-800 rounded-xl px-4 py-3 flex flex-col justify-center">
                   <p className="text-gray-500 text-xs">Total Cost</p>
                   <p className="text-amber-400 font-bold text-lg">
-                    ₦
-                    {(
+                    {formatPrice(
                       (parseFloat(restockForm.quantity_added) || 0) *
-                      (parseFloat(restockForm.cost_price_per_unit) || 0)
-                    ).toLocaleString()}
+                        (parseFloat(restockForm.cost_price_per_unit) || 0)
+                    )}
                   </p>
                 </div>
               </div>

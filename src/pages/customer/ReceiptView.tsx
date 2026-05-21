@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { sendPushToStaff } from '../../hooks/usePushNotifications'
+import { formatPrice } from '../../lib/currency'
 import { HelpTooltip } from '../../components/HelpTooltip'
 import { Receipt, Bell, Plus, Loader, CheckCircle, Clock, ChefHat, Truck } from 'lucide-react'
 
@@ -245,7 +246,7 @@ export default function ReceiptView() {
                   <div className="text-right shrink-0">
                     <p className="text-gray-500 text-xs">x{item.quantity}</p>
                     <p className="text-white text-sm font-bold">
-                      ₦{(unitPrice * item.quantity).toLocaleString()}
+                      {formatPrice(unitPrice * item.quantity)}
                     </p>
                   </div>
                 </div>
@@ -256,7 +257,7 @@ export default function ReceiptView() {
             <div className="flex items-center justify-between pt-1">
               <span className="text-white font-bold">Total</span>
               <span className="text-amber-400 font-bold text-xl">
-                ₦{order.total_amount?.toLocaleString()}
+                {formatPrice(order.total_amount || 0)}
               </span>
             </div>
           </div>

@@ -77,7 +77,7 @@ export default function RoomEditModal({
             </div>
           </div>
           <div>
-            <label className={labelCls}>Rate Per Night (₦)</label>
+            <label className={labelCls}>Rate Per Night (SSP)</label>
             <input
               type="number"
               value={form.rate_per_night}

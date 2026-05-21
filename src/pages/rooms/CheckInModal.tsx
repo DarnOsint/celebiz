@@ -10,6 +10,7 @@ import {
   Smartphone,
   CheckCircle,
 } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 import type { RoomRow, CheckinForm } from './types'
 import { ID_TYPES } from './types'
 
@@ -64,7 +65,7 @@ export default function CheckInModal({
         <div className="flex items-center justify-between p-5 border-b border-gray-800 shrink-0">
           <div>
             <h3 className="text-white font-bold">Check In — {room.name}</h3>
-            <p className="text-amber-400 text-sm">₦{room.rate_per_night?.toLocaleString()}/night</p>
+            <p className="text-amber-400 text-sm">{formatPrice(room.rate_per_night || 0)}/night</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
             <X size={20} />
@@ -224,12 +225,10 @@ export default function CheckInModal({
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-xs">
-                {form.nights} night{parseInt(form.nights) > 1 ? 's' : ''} × ₦
-                {room.rate_per_night?.toLocaleString()}
+                {form.nights} night{parseInt(form.nights) > 1 ? 's' : ''} ×{' '}
+                {formatPrice(room.rate_per_night || 0)}
               </p>
-              <p className="text-white font-bold text-xl break-all mt-0.5">
-                ₦{total.toLocaleString()}
-              </p>
+              <p className="text-white font-bold text-xl break-all mt-0.5">{formatPrice(total)}</p>
             </div>
             <CheckCircle size={28} className="text-amber-500" />
           </div>
@@ -251,7 +250,7 @@ export default function CheckInModal({
             className="w-full bg-green-600 hover:bg-green-500 disabled:bg-gray-700 text-white font-bold rounded-xl py-3 flex items-center justify-center gap-2 transition-colors"
           >
             <CheckCircle size={16} />
-            {saving ? 'Processing...' : `Confirm Check-in — ₦${total.toLocaleString()}`}
+            {saving ? 'Processing...' : `Confirm Check-in — ${formatPrice(total)}`}
           </button>
         </div>
       </div>

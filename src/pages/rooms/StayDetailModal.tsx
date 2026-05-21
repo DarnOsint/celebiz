@@ -1,4 +1,5 @@
 import { X } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 import type { StayRow } from './types'
 
 interface Props {
@@ -29,8 +30,8 @@ export default function StayDetailModal({ stay, onClose }: Props) {
               ['Check-in', new Date(stay.check_in_at).toLocaleString('en-NG')],
               ['Check-out', new Date(stay.check_out_at).toLocaleString('en-NG')],
               ['Nights', stay.nights],
-              ['Rate/Night', `₦${stay.rate_per_night?.toLocaleString()}`],
-              ['Total Paid', `₦${stay.total_amount?.toLocaleString()}`],
+              ['Rate/Night', formatPrice(stay.rate_per_night || 0)],
+              ['Total Paid', formatPrice(stay.total_amount || 0)],
               ['Payment', stay.payment_method],
               ['Reference', stay.payment_reference || '—'],
               ['Checked in by', stay.checked_in_by_name],

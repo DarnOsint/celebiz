@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { formatPrice } from '../../lib/currency'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
-import { useGeofence } from '../../hooks/useGeofence'
-import GeofenceBlock from '../../components/GeofenceBlock'
 import ErrorBoundary from '../../components/ErrorBoundary'
 import { HelpTooltip } from '../../components/HelpTooltip'
 import { useVisibilityInterval } from '../../hooks/useVisibilityInterval'
@@ -128,7 +127,6 @@ const SUPERVISOR_TIPS = [
 
 function SupervisorDashboardInner() {
   const { profile, signOut } = useAuth()
-  const { status: geoStatus, distance: geoDist, location: geoLocation } = useGeofence('main')
   const [orders, setOrders] = useState<OpenOrder[]>([])
   const [shifts, setShifts] = useState<ActiveShift[]>([])
   const [calls, setCalls] = useState<WaiterCall[]>([])
@@ -241,8 +239,6 @@ function SupervisorDashboardInner() {
     { id: 'tables' as const, label: 'Tables', icon: LayoutGrid, badge: 0, badgeRed: false },
   ]
 
-  if (geoStatus === 'outside')
-    return <GeofenceBlock status={geoStatus} distance={geoDist} location={geoLocation} />
   if (loading)
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
@@ -486,7 +482,7 @@ function SupervisorDashboardInner() {
               <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2 flex items-center justify-between">
                 <span className="text-red-400 text-xs font-semibold">Total voided today</span>
                 <span className="text-red-400 font-bold">
-                  ₦{voids.reduce((s, v) => s + (v.total_value || 0), 0).toLocaleString()}
+                  {formatPrice(voids.reduce((s, v) => s + (v.total_value || 0), 0))}
                 </span>
               </div>
               {voids.map((v) => (
@@ -501,7 +497,7 @@ function SupervisorDashboardInner() {
                     </p>
                   </div>
                   <p className="text-red-400 font-bold text-sm">
-                    ₦{(v.total_value || 0).toLocaleString()}
+                    {formatPrice(v.total_value || 0)}
                   </p>
                 </div>
               ))}

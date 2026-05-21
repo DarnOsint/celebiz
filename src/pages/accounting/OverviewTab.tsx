@@ -27,6 +27,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { audit } from '../../lib/audit'
 import type { AccountingSummary, TrendPoint, WaitronStat } from './types'
+import { formatPrice, getCurrencySymbol } from '../../lib/currency'
 
 interface Props {
   summary: AccountingSummary
@@ -427,42 +428,42 @@ export default function OverviewTab({
   const cards = [
     {
       label: 'Gross Revenue',
-      value: `₦${summary.total.toLocaleString()}`,
+      value: formatPrice(summary.total),
       icon: TrendingUp,
       color: 'text-amber-400',
       bg: 'bg-amber-400/10',
     },
     {
       label: 'Net Revenue',
-      value: `₦${netRevenue.toLocaleString()}`,
+      value: formatPrice(netRevenue),
       icon: DollarSign,
       color: 'text-green-400',
       bg: 'bg-green-400/10',
     },
     {
       label: 'Cash',
-      value: `₦${(summary.byMethod?.['Cash'] || 0).toLocaleString()}`,
+      value: formatPrice(summary.byMethod?.['Cash'] || 0),
       icon: Banknote,
       color: 'text-emerald-400',
       bg: 'bg-emerald-400/10',
     },
     {
       label: 'Bank POS',
-      value: `₦${(summary.byMethod?.['Bank POS'] || 0).toLocaleString()}`,
+      value: formatPrice(summary.byMethod?.['Bank POS'] || 0),
       icon: CreditCard,
       color: 'text-blue-400',
       bg: 'bg-blue-400/10',
     },
     {
       label: 'Transfer',
-      value: `₦${(summary.byMethod?.['Transfer'] || 0).toLocaleString()}`,
+      value: formatPrice(summary.byMethod?.['Transfer'] || 0),
       icon: Smartphone,
       color: 'text-purple-400',
       bg: 'bg-purple-400/10',
     },
     {
       label: 'Avg Order',
-      value: `₦${summary.avgOrder.toLocaleString()}`,
+      value: formatPrice(summary.avgOrder),
       icon: Receipt,
       color: 'text-pink-400',
       bg: 'bg-pink-400/10',
@@ -514,7 +515,7 @@ export default function OverviewTab({
                   <span className="text-white text-sm font-medium">{w.name}</span>
                   <span className="text-gray-500 text-xs ml-2">{w.orders} orders</span>
                 </div>
-                <span className="text-amber-400 font-bold">₦{w.revenue.toLocaleString()}</span>
+                <span className="text-amber-400 font-bold">{formatPrice(w.revenue)}</span>
               </div>
             ))}
           </div>
@@ -530,7 +531,7 @@ export default function OverviewTab({
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-400">{item.label}</span>
                 <span className="text-white font-medium">
-                  ₦{item.value.toLocaleString()} (
+                  {formatPrice(item.value)} (
                   {summary.total ? Math.round((item.value / summary.total) * 100) : 0}%)
                 </span>
               </div>
@@ -632,11 +633,11 @@ export default function OverviewTab({
                 <div key={w.name} className="flex items-center gap-2">
                   <span className="text-gray-400 text-sm w-32 truncate">{w.name}</span>
                   <span className="text-gray-600 text-xs w-32">
-                    exp cash ₦{(w.cashExpected || 0).toLocaleString()}
+                    exp cash {formatPrice(w.cashExpected || 0)}
                   </span>
                   <input
                     type="number"
-                    placeholder="₦ cash"
+                    placeholder="0.00 cash"
                     value={recon.cashCollected[w.name] || ''}
                     onChange={(e) =>
                       setRecon((prev) => ({
@@ -651,11 +652,11 @@ export default function OverviewTab({
                     className="flex-1 bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500"
                   />
                   <span className="text-gray-600 text-xs w-36">
-                    exp POS+transfer ₦{(w.transferExpected || 0).toLocaleString()}
+                    exp POS+transfer {formatPrice(w.transferExpected || 0)}
                   </span>
                   <input
                     type="number"
-                    placeholder="₦ POS/transfer"
+                    placeholder="0.00 POS/transfer"
                     value={recon.transferReceipts[w.name] || ''}
                     onChange={(e) =>
                       setRecon((prev) => ({
@@ -674,7 +675,7 @@ export default function OverviewTab({
               <div className="flex justify-between pt-1 border-t border-gray-700">
                 <span className="text-gray-400 text-sm font-medium">Total Cash Collected</span>
                 <span className="text-emerald-400 font-bold">
-                  ₦{totalCashCollected.toLocaleString()}
+                  {formatPrice(totalCashCollected)}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -682,7 +683,7 @@ export default function OverviewTab({
                   Total POS and Transfer Receipts
                 </span>
                 <span className="text-purple-400 font-bold">
-                  ₦{totalTransferReceipts.toLocaleString()}
+                  {formatPrice(totalTransferReceipts)}
                 </span>
               </div>
             </div>
@@ -707,25 +708,25 @@ export default function OverviewTab({
                 <div key={w.name} className="flex items-center gap-2">
                   <span className="text-gray-400 text-sm w-32 truncate">{w.name}</span>
                   <span className="text-gray-500 text-xs shrink-0">
-                    remitted ₦
-                    {(
+                    remitted{' '}
+                    {formatPrice(
                       (recon.cashCollected[w.name] || 0) + (recon.transferReceipts[w.name] || 0)
-                    ).toLocaleString()}
+                    )}
                   </span>
                   <span className="text-gray-500 text-xs shrink-0">
-                    expected ₦{((w.cashExpected || 0) + (w.transferExpected || 0)).toLocaleString()}
+                    expected {formatPrice((w.cashExpected || 0) + (w.transferExpected || 0))}
                   </span>
                   <span className="text-red-400 text-xs shrink-0">
-                    shortage: ₦{shortage.toLocaleString()}
+                    shortage: {formatPrice(shortage)}
                   </span>
                   {isSingleDay && excess > 0 && (
                     <span className="text-green-400 text-xs shrink-0">
-                      excess: ₦{excess.toLocaleString()}
+                      excess: {formatPrice(excess)}
                     </span>
                   )}
                   {credit > 0 && (
                     <span className="text-amber-400 text-xs shrink-0">
-                      Credit: ₦{credit.toLocaleString()}
+                      Credit: {formatPrice(credit)}
                     </span>
                   )}
                 </div>
@@ -763,9 +764,7 @@ export default function OverviewTab({
                       </p>
                       {d.items && <p className="text-gray-400 text-[10px] mt-0.5">{d.items}</p>}
                     </div>
-                    <span className="text-red-400 text-xs font-bold">
-                      ₦{d.amount.toLocaleString()}
-                    </span>
+                    <span className="text-red-400 text-xs font-bold">{formatPrice(d.amount)}</span>
                   </div>
                 ))}
               </div>
@@ -773,7 +772,7 @@ export default function OverviewTab({
           )}
           <div className="text-right text-sm text-gray-300 mt-2">
             Total Outstanding:{' '}
-            <span className="text-red-400 font-semibold">₦{totalOutstanding.toLocaleString()}</span>
+            <span className="text-red-400 font-semibold">{formatPrice(totalOutstanding)}</span>
           </div>
         </div>
 
@@ -782,28 +781,28 @@ export default function OverviewTab({
           <h4 className="text-white font-bold text-sm mb-3">End of Day Summary</h4>
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Total Sales (POS)</span>
-            <span className="text-white font-bold">₦{expectedRevenue.toLocaleString()}</span>
+            <span className="text-white font-bold">{formatPrice(expectedRevenue)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Cash Collected</span>
-            <span className="text-emerald-400">₦{totalCashCollected.toLocaleString()}</span>
+            <span className="text-emerald-400">{formatPrice(totalCashCollected)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">POS and Transfer Receipts</span>
-            <span className="text-purple-400">₦{totalTransferReceipts.toLocaleString()}</span>
+            <span className="text-purple-400">{formatPrice(totalTransferReceipts)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Expenses/Payouts</span>
-            <span className="text-red-400">₦{totalPayouts.toLocaleString()}</span>
+            <span className="text-red-400">{formatPrice(totalPayouts)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">Outstanding / Shortage (Waitrons)</span>
-            <span className="text-red-400">₦{totalOutstanding.toLocaleString()}</span>
+            <span className="text-red-400">{formatPrice(totalOutstanding)}</span>
           </div>
           <div className="border-t-2 border-gray-700 pt-2 mt-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Total Accounted For</span>
-              <span className="text-white font-bold">₦{totalReceived.toLocaleString()}</span>
+              <span className="text-white font-bold">{formatPrice(totalReceived)}</span>
             </div>
           </div>
           <div className="border-t-2 border-gray-600 pt-2">
@@ -825,7 +824,7 @@ export default function OverviewTab({
                 <span
                   className={`text-xl font-bold ${shortfall > 0 ? 'text-red-400' : shortfall < 0 ? 'text-green-400' : 'text-green-400'}`}
                 >
-                  ₦{Math.abs(shortfall).toLocaleString()}
+                  {formatPrice(Math.abs(shortfall))}
                 </span>
               </div>
             </div>
@@ -843,7 +842,7 @@ export default function OverviewTab({
               <XAxis dataKey="day" tick={{ fill: '#6b7280', fontSize: 10 }} />
               <YAxis
                 tick={{ fill: '#6b7280', fontSize: 10 }}
-                tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`}
+                tickFormatter={(v) => `${getCurrencySymbol()}${(v / 1000).toFixed(0)}k`}
               />
               <Tooltip
                 contentStyle={{
@@ -852,7 +851,7 @@ export default function OverviewTab({
                   borderRadius: '8px',
                 }}
                 labelStyle={{ color: '#fff' }}
-                formatter={(v: number) => [`₦${v.toLocaleString()}`, 'Revenue']}
+                formatter={(v: number) => [formatPrice(v), 'Revenue']}
               />
               <Line
                 type="monotone"
@@ -879,11 +878,11 @@ export default function OverviewTab({
         </div>
         <div className="flex items-center justify-between">
           <span className="text-gray-400">Total expenses this period</span>
-          <span className="text-red-400 font-bold text-xl">₦{totalPayouts.toLocaleString()}</span>
+          <span className="text-red-400 font-bold text-xl">{formatPrice(totalPayouts)}</span>
         </div>
         <div className="flex items-center justify-between mt-2">
           <span className="text-gray-400">Net after expenses</span>
-          <span className="text-green-400 font-bold text-xl">₦{netRevenue.toLocaleString()}</span>
+          <span className="text-green-400 font-bold text-xl">{formatPrice(netRevenue)}</span>
         </div>
       </div>
     </div>

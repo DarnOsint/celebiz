@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
+import { formatPrice } from '../../lib/currency'
 import {
   setPrintServerUrl,
   setStationPrinterUrl,
@@ -38,8 +39,7 @@ import PaymentModal from './PaymentModal'
 import CashSaleModal from './CashSaleModal'
 import CustomerOrderAlerts from '../../components/CustomerOrderAlerts'
 import WaiterCalls from '../management/WaiterCalls'
-import { useGeofence } from '../../hooks/useGeofence'
-import GeofenceBlock from '../../components/GeofenceBlock'
+
 import type { Table, MenuItem, Order, OrderItem, Profile } from '../../types'
 import { useToast } from '../../context/ToastContext'
 import { localBulkPut, localGetAll } from '../../lib/db'
@@ -247,7 +247,7 @@ function DesktopMenuBrowser({
                   <p className="text-white text-sm font-medium leading-tight truncate">
                     {item.name}
                   </p>
-                  <p className="text-amber-400 text-sm font-bold mt-1">₦{item.price.toFixed(2)}</p>
+                  <p className="text-amber-400 text-sm font-bold mt-1">{formatPrice(item.price)}</p>
                 </div>
               </button>
             )
@@ -262,7 +262,6 @@ export default function POS() {
   const { profile, signOut } = useAuth()
   const toast = useToast()
   usePushNotifications(profile?.id)
-  const { status: geoStatus, distance: geoDist, location: geoLocation } = useGeofence('main')
   const isWaitron = profile?.role === 'waitron'
 
   const [tables, setTables] = useState<Table[]>([])
@@ -1429,9 +1428,6 @@ export default function POS() {
     if (isWaitron && posTab !== 'tables') setPosTab('tables')
   }, [isWaitron, posTab])
 
-  if (geoStatus === 'outside')
-    return <GeofenceBlock status={geoStatus} distance={geoDist} location={geoLocation} />
-
   if (isClockedIn === false)
     return (
       <div className="min-h-full bg-gray-950 flex items-center justify-center p-6">
@@ -1906,11 +1902,7 @@ export default function POS() {
                     Total Sales
                   </p>
                   <p className="text-amber-400 text-4xl font-bold tracking-tight">
-                    ₦
-                    {shiftStats.totalSales.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                    {formatPrice(shiftStats.totalSales)}
                   </p>
                 </div>
 
@@ -1975,7 +1967,7 @@ export default function POS() {
                                 {order.tables?.name || 'Cash Sale'}
                               </p>
                               <p className="text-amber-400 font-bold text-sm">
-                                ₦{(order.netTotal || 0).toLocaleString()}
+                                {formatPrice(order.netTotal || 0)}
                               </p>
                             </div>
                             <div className="flex items-center justify-between">
@@ -2096,9 +2088,7 @@ export default function POS() {
                             </div>
                           </div>
                           <div className="text-right flex items-center gap-3">
-                            <p className="text-amber-400 font-bold">
-                              ₦{displayTotal.toLocaleString()}
-                            </p>
+                            <p className="text-amber-400 font-bold">{formatPrice(displayTotal)}</p>
                             <button
                               onClick={() => setReprintOrder(order)}
                               className="flex items-center gap-1 text-gray-500 hover:text-white text-xs px-2 py-1 bg-gray-800 rounded-lg transition-colors"
@@ -2125,7 +2115,7 @@ export default function POS() {
                                         'Item'}
                                     </td>
                                     <td className="text-gray-400 py-0.5 text-right pl-2">
-                                      ₦{(item.total_price || 0).toLocaleString()}
+                                      {formatPrice(item.total_price || 0)}
                                     </td>
                                   </tr>
                                 ))}

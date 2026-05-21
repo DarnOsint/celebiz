@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Beer, ChefHat, Printer, RefreshCw, Search } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { formatPrice } from '../../lib/currency'
 
 const todayStr = () => {
   const now = new Date()
@@ -279,7 +280,7 @@ export default function StockSummaryTab({ type }: Props) {
                     {label} Sales Revenue
                   </p>
                   <p className="text-white text-2xl font-black mt-1">
-                    ₦{stationSales.revenue.toLocaleString()}
+                    {formatPrice(stationSales.revenue)}
                   </p>
                   <p className="text-gray-400 text-xs">{stationSales.qty} items sold</p>
                 </div>
@@ -290,7 +291,7 @@ export default function StockSummaryTab({ type }: Props) {
                     .sort((a, b) => b[1] - a[1])
                     .map(([zone, rev]) => (
                       <div key={zone} className="text-center">
-                        <p className="text-amber-400 font-bold text-sm">₦{rev.toLocaleString()}</p>
+                        <p className="text-amber-400 font-bold text-sm">{formatPrice(rev)}</p>
                         <p className="text-gray-500 text-[9px] uppercase tracking-wider">{zone}</p>
                       </div>
                     ))}

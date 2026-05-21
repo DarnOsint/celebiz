@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { supabase } from '../../../lib/supabase'
+import { formatPrice } from '../../../lib/currency'
 import { RefreshCw, Download } from 'lucide-react'
 import React from 'react'
 
@@ -234,7 +235,7 @@ export default function OrdersByWaitronTab({
                   >
                     <td className="px-3 py-2">{r.waitron}</td>
                     <td className="px-3 py-2 text-right">{r.count}</td>
-                    <td className="px-3 py-2 text-right">₦{r.total.toLocaleString()}</td>
+                    <td className="px-3 py-2 text-right">{formatPrice(r.total)}</td>
                   </tr>
                 </React.Fragment>
               ))}
@@ -271,7 +272,7 @@ export default function OrdersByWaitronTab({
                             ${items
                               .map(
                                 (it) =>
-                                  `<tr><td>${new Date(it.at).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' })}</td><td>${it.name}</td><td>${it.qty}</td><td>₦${it.total.toLocaleString()}</td></tr>`
+                                  `<tr><td>${new Date(it.at).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' })}</td><td>${it.name}</td><td>${it.qty}</td><td>${formatPrice(it.total)}</td></tr>`
                               )
                               .join('')}
                           </tbody>
@@ -336,7 +337,7 @@ export default function OrdersByWaitronTab({
                             </td>
                             <td className="px-3 py-2">{name}</td>
                             <td className="px-3 py-2 text-right">{v.qty}</td>
-                            <td className="px-3 py-2 text-right">₦{v.total.toLocaleString()}</td>
+                            <td className="px-3 py-2 text-right">{formatPrice(v.total)}</td>
                           </tr>
                         ))
                     })()}

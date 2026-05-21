@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { TimesheetEntry } from './types'
 import type { Order } from '../../types'
 import { getNetOrderAmount } from './orderAmounts'
+import { formatPrice } from '../../lib/currency'
 
 interface Props {
   timesheet: TimesheetEntry[]
@@ -36,7 +37,7 @@ interface WaitronEntry {
   credit: number
 }
 
-const fmt = (n: number) => `₦${n.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`
+const fmt = (n: number) => formatPrice(n)
 const fmtTime = (ts?: string | null) =>
   ts
     ? new Date(ts).toLocaleTimeString('en-NG', {

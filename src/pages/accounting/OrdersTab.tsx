@@ -1,5 +1,6 @@
 import type { Order } from '../../types'
 import { getNetOrderAmount, getValidOrderItemCount } from './orderAmounts'
+import { formatPrice } from '../../lib/currency'
 
 interface OrderFilter {
   status: string
@@ -118,7 +119,7 @@ export default function OrdersTab({ orders, orderFilter, onFilterChange }: Props
                       </span>
                     </td>
                     <td className="px-4 py-3 text-amber-400 font-bold text-sm whitespace-nowrap">
-                      ₦{getNetOrderAmount(order).toLocaleString()}
+                      {formatPrice(getNetOrderAmount(order))}
                     </td>
                   </tr>
                 ))

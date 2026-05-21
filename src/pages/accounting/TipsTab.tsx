@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
+import { formatPrice } from '../../lib/currency'
 import { Printer, CheckCircle, Clock, Users, TrendingUp } from 'lucide-react'
 
 interface Tip {
@@ -131,9 +132,9 @@ export default function TipsTab({ dateRange }: Props) {
         <td style="padding:6px 8px;border-bottom:1px solid #eee;">${i + 1}</td>
         <td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:600;">${w.waitron_name}</td>
         <td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center;">${w.tip_count}</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right;">₦${w.pending.toLocaleString()}</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right;">₦${w.disbursed.toLocaleString()}</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:bold;">₦${w.total_tips.toLocaleString()}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right;">${formatPrice(w.pending)}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right;">${formatPrice(w.disbursed)}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:bold;">${formatPrice(w.total_tips)}</td>
       </tr>
     `
       )
@@ -146,9 +147,9 @@ export default function TipsTab({ dateRange }: Props) {
         <td style="padding:5px 8px;border-bottom:1px solid #eee;font-size:11px;">${new Date(t.created_at).toLocaleString('en-NG')}</td>
         <td style="padding:5px 8px;border-bottom:1px solid #eee;">${t.waitron_name}</td>
         <td style="padding:5px 8px;border-bottom:1px solid #eee;">${t.table_name || '—'}</td>
-        <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">₦${t.order_total.toLocaleString()}</td>
-        <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">₦${t.amount_received.toLocaleString()}</td>
-        <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:bold;color:green;">₦${t.tip_amount.toLocaleString()}</td>
+        <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">${formatPrice(t.order_total)}</td>
+        <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;">${formatPrice(t.amount_received)}</td>
+        <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:bold;color:green;">${formatPrice(t.tip_amount)}</td>
         <td style="padding:5px 8px;border-bottom:1px solid #eee;text-align:center;">
           <span style="background:${t.status === 'disbursed' ? '#d1fae5' : '#fef3c7'};color:${t.status === 'disbursed' ? '#065f46' : '#92400e'};padding:2px 8px;border-radius:99px;font-size:11px;">
             ${t.status}
@@ -176,9 +177,9 @@ export default function TipsTab({ dateRange }: Props) {
         <h1>Celebiz — Tips Report</h1>
         <p>${dateRange.from} to ${dateRange.to} &nbsp;|&nbsp; Printed at ${time} on ${date}</p>
         <div class="totals">
-          Total Tips: ₦${totalTips.toLocaleString()} &nbsp;|&nbsp;
-          Pending Disbursement: ₦${totalPending.toLocaleString()} &nbsp;|&nbsp;
-          Disbursed: ₦${totalDisbursed.toLocaleString()}
+          Total Tips: ${formatPrice(totalTips)} &nbsp;|&nbsp;
+          Pending Disbursement: ${formatPrice(totalPending)} &nbsp;|&nbsp;
+          Disbursed: ${formatPrice(totalDisbursed)}
         </div>
         <h2>Summary by Waitron</h2>
         <table><thead><tr>
@@ -202,8 +203,6 @@ export default function TipsTab({ dateRange }: Props) {
     }, 300)
   }
 
-  const fmt = (n: number) => `₦${n.toLocaleString()}`
-
   return (
     <div className="p-4 space-y-4">
       {/* Stats row */}
@@ -213,21 +212,21 @@ export default function TipsTab({ dateRange }: Props) {
             <TrendingUp size={14} className="text-green-400" />
             <p className="text-gray-400 text-xs">Total Tips</p>
           </div>
-          <p className="text-white font-bold text-xl">{fmt(totalTips)}</p>
+          <p className="text-white font-bold text-xl">{formatPrice(totalTips)}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-1">
             <Clock size={14} className="text-amber-400" />
             <p className="text-gray-400 text-xs">Pending</p>
           </div>
-          <p className="text-amber-400 font-bold text-xl">{fmt(totalPending)}</p>
+          <p className="text-amber-400 font-bold text-xl">{formatPrice(totalPending)}</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-1">
             <CheckCircle size={14} className="text-green-400" />
             <p className="text-gray-400 text-xs">Disbursed</p>
           </div>
-          <p className="text-green-400 font-bold text-xl">{fmt(totalDisbursed)}</p>
+          <p className="text-green-400 font-bold text-xl">{formatPrice(totalDisbursed)}</p>
         </div>
       </div>
 
@@ -276,18 +275,20 @@ export default function TipsTab({ dateRange }: Props) {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-green-400 font-bold text-lg">{fmt(w.total_tips)}</p>
+                  <p className="text-green-400 font-bold text-lg">{formatPrice(w.total_tips)}</p>
                   <p className="text-gray-500 text-xs">total earned</p>
                 </div>
               </div>
               <div className="border-t border-gray-800 px-4 py-3 flex items-center justify-between">
                 <div className="flex gap-4">
                   <div>
-                    <p className="text-amber-400 text-sm font-semibold">{fmt(w.pending)}</p>
+                    <p className="text-amber-400 text-sm font-semibold">{formatPrice(w.pending)}</p>
                     <p className="text-gray-500 text-xs">pending</p>
                   </div>
                   <div>
-                    <p className="text-green-400 text-sm font-semibold">{fmt(w.disbursed)}</p>
+                    <p className="text-green-400 text-sm font-semibold">
+                      {formatPrice(w.disbursed)}
+                    </p>
                     <p className="text-gray-500 text-xs">disbursed</p>
                   </div>
                 </div>
@@ -297,7 +298,9 @@ export default function TipsTab({ dateRange }: Props) {
                     disabled={disbursing === w.waitron_id}
                     className="bg-green-500 hover:bg-green-400 disabled:bg-gray-700 text-black text-xs font-bold px-3 py-2 rounded-xl transition-colors"
                   >
-                    {disbursing === w.waitron_id ? 'Processing...' : `Disburse ${fmt(w.pending)}`}
+                    {disbursing === w.waitron_id
+                      ? 'Processing...'
+                      : `Disburse ${formatPrice(w.pending)}`}
                   </button>
                 )}
                 {w.pending === 0 && (
@@ -326,8 +329,10 @@ export default function TipsTab({ dateRange }: Props) {
                     </span>
                   </div>
                   <div className="flex items-center gap-3 mt-1">
-                    <p className="text-gray-500 text-xs">Order: {fmt(tip.order_total)}</p>
-                    <p className="text-gray-500 text-xs">Received: {fmt(tip.amount_received)}</p>
+                    <p className="text-gray-500 text-xs">Order: {formatPrice(tip.order_total)}</p>
+                    <p className="text-gray-500 text-xs">
+                      Received: {formatPrice(tip.amount_received)}
+                    </p>
                     <p className="text-xs text-gray-500">
                       {new Date(tip.created_at).toLocaleString('en-NG', {
                         day: '2-digit',
@@ -339,7 +344,7 @@ export default function TipsTab({ dateRange }: Props) {
                   </div>
                 </div>
                 <p className="text-green-400 font-bold text-lg whitespace-nowrap">
-                  +{fmt(tip.tip_amount)}
+                  +{formatPrice(tip.tip_amount)}
                 </p>
               </div>
             </div>

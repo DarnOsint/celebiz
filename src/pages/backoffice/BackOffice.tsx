@@ -17,6 +17,7 @@ import {
   Beer,
   Camera,
   Network,
+  DollarSign,
 } from 'lucide-react'
 import { HelpTooltip } from '../../components/HelpTooltip'
 import StaffManagement from './StaffManagement'
@@ -34,6 +35,7 @@ import TakeawayPacks from './TakeawayPacks'
 import BarChillerStock from './BarChillerStock'
 import CCTVConfig from './CCTVConfig'
 import NetworkPrinters from './NetworkPrinters'
+import CurrencyConfig from './CurrencyConfig'
 import { useNavigate } from 'react-router-dom'
 import type { Role } from '../../types'
 
@@ -178,6 +180,14 @@ export default function BackOffice() {
       roles: ['owner', 'manager'],
     },
     {
+      id: 'currency',
+      label: 'Currency Settings',
+      desc: 'Set active currency (SSP/Dollar) and exchange rate',
+      icon: DollarSign,
+      color: 'bg-green-600',
+      roles: ['owner', 'manager'],
+    },
+    {
       id: 'changepassword',
       label: 'Change Password',
       desc: 'Update your account login password',
@@ -230,6 +240,7 @@ export default function BackOffice() {
     return <NetworkPrinters onBack={() => setActiveSection(null)} />
   if (activeSection === 'printerconfig')
     return <PrinterConfig onBack={() => setActiveSection(null)} />
+  if (activeSection === 'currency') return <CurrencyConfig onBack={() => setActiveSection(null)} />
   if (activeSection === 'takeawaypacks')
     return <TakeawayPacks onBack={() => setActiveSection(null)} />
 

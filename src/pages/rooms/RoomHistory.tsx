@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { formatPrice } from '../../lib/currency'
 import type { StayRow } from './types'
 
 export default function RoomHistory() {
@@ -28,7 +29,7 @@ export default function RoomHistory() {
     <div className="space-y-3">
       <div className="flex items-center justify-between mb-2">
         <p className="text-gray-400 text-sm">{history.length} past stays</p>
-        <p className="text-gray-500 text-xs">Total: ₦{total.toLocaleString()}</p>
+        <p className="text-gray-500 text-xs">Total: {formatPrice(total)}</p>
       </div>
       {history.length === 0 ? (
         <div className="text-center py-12 text-gray-500">No checkout history yet</div>
@@ -50,7 +51,7 @@ export default function RoomHistory() {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-amber-400 font-bold">₦{stay.total_amount?.toLocaleString()}</p>
+              <p className="text-amber-400 font-bold">{formatPrice(stay.total_amount || 0)}</p>
               <span
                 className={`text-xs px-2 py-0.5 rounded-lg ${stay.status === 'overstay' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}
               >

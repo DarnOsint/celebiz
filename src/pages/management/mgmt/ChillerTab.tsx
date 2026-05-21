@@ -5,6 +5,7 @@ import { useAuth } from '../../../context/AuthContext'
 import { useToast } from '../../../context/ToastContext'
 import { audit } from '../../../lib/audit'
 import type { Profile } from '../../../types'
+import { formatPrice } from '../../../lib/currency'
 
 const todayWAT = () => {
   const wat = new Date(new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' }))
@@ -560,7 +561,7 @@ export default function ChillerTab() {
                     Bar Sales Revenue
                   </p>
                   <p className="text-white text-2xl font-black mt-1">
-                    ₦{salesStats.revenue.toLocaleString()}
+                    {formatPrice(salesStats.revenue)}
                   </p>
                   <p className="text-gray-400 text-xs">{salesStats.qty} drinks sold</p>
                 </div>
@@ -571,7 +572,7 @@ export default function ChillerTab() {
                     .sort((a, b) => b[1] - a[1])
                     .map(([zone, rev]) => (
                       <div key={zone} className="text-center">
-                        <p className="text-amber-400 font-bold text-sm">₦{rev.toLocaleString()}</p>
+                        <p className="text-amber-400 font-bold text-sm">{formatPrice(rev)}</p>
                         <p className="text-gray-500 text-[9px] uppercase tracking-wider">{zone}</p>
                       </div>
                     ))}

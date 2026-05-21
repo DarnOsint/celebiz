@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { ShoppingCart, Check, X, ChevronDown, ChevronUp, Clock } from 'lucide-react'
 import type { Profile } from '../types'
+import { formatPrice } from '../../lib/currency'
 
 function useElapsed(since: string | null): string {
   const [elapsed, setElapsed] = useState(0)
@@ -132,8 +133,8 @@ function CustomerOrderCard({
           <ShoppingCart size={15} className="text-amber-400" />
           <span className="text-white font-bold text-sm">{order.table_name}</span>
           <span className="text-amber-400 text-xs">
-            {order.items?.length} item{order.items?.length !== 1 ? 's' : ''} · ₦
-            {order.total_amount?.toLocaleString()}
+            {order.items?.length} item{order.items?.length !== 1 ? 's' : ''} ·{' '}
+            {formatPrice(order.total_amount || 0)}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -155,7 +156,7 @@ function CustomerOrderCard({
                 <span className="text-gray-300">
                   {item.quantity}x {item.name}
                 </span>
-                <span className="text-gray-500">₦{item.total?.toLocaleString()}</span>
+                <span className="text-gray-500">{formatPrice(item.total || 0)}</span>
               </div>
             ))}
           </div>

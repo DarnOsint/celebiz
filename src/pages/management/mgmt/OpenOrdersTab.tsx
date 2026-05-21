@@ -6,6 +6,7 @@ import { useAuth } from '../../../context/AuthContext'
 import { useToast } from '../../../context/ToastContext'
 import { useVisibilityInterval } from '../../../hooks/useVisibilityInterval'
 import EditOrderModal from './EditOrderModal'
+import { formatPrice } from '../../../lib/currency'
 import type { Profile } from '../../../types'
 
 interface DeleteRequest {
@@ -190,7 +191,7 @@ export default function OpenOrdersTab() {
                     {req.table_name} — requested by {req.waitron_name}
                   </p>
                   <p className="text-gray-500 text-xs">
-                    ₦{req.item_total.toLocaleString()} ·{' '}
+                    {formatPrice(req.item_total)} ·{' '}
                     {new Date(req.requested_at).toLocaleTimeString('en-NG', {
                       hour: '2-digit',
                       minute: '2-digit',
@@ -257,9 +258,7 @@ export default function OpenOrdersTab() {
                     <p className="text-gray-400 text-xs">{order.profiles?.full_name}</p>
                   </div>
                   <div className="text-right flex flex-col items-end gap-1.5">
-                    <p className="text-amber-400 font-bold">
-                      ₦{order.total_amount?.toLocaleString()}
-                    </p>
+                    <p className="text-amber-400 font-bold">{formatPrice(order.total_amount)}</p>
                     <p className="text-gray-500 text-xs">
                       {new Date(order.created_at).toLocaleTimeString('en-NG', {
                         timeZone: 'Africa/Lagos',
@@ -317,9 +316,7 @@ export default function OpenOrdersTab() {
                       <span className="text-gray-300">
                         {item.quantity}x {item.menu_items?.name}
                       </span>
-                      <span className="text-gray-400">
-                        ₦{(item.total_price as number)?.toLocaleString()}
-                      </span>
+                      <span className="text-gray-400">{formatPrice(item.total_price)}</span>
                     </div>
                   ))}
                   {visibleItems.length === 0 && (

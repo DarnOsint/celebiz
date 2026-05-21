@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Package, RefreshCw, Search, Download } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
+import { formatPrice } from '../../../lib/currency'
 
 interface InventoryItem {
   id: string
@@ -168,7 +169,7 @@ export default function MainStoreSummaryTab() {
               },
               {
                 label: 'Stock Value',
-                value: `₦${totalValue.toLocaleString()}`,
+                value: formatPrice(totalValue),
                 color: 'text-purple-400',
               },
             ].map((k) => (

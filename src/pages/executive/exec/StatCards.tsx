@@ -1,4 +1,5 @@
 import { TrendingUp, ShoppingBag, LayoutDashboard, BedDouble, Users, Package } from 'lucide-react'
+import { formatPrice } from '../../../lib/currency'
 import type { Stats } from './types'
 
 interface Props {
@@ -9,7 +10,7 @@ export default function StatCards({ stats }: Props) {
   const cards = [
     {
       label: "Today's Revenue",
-      value: `₦${stats.revenue.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`,
+      value: formatPrice(stats.revenue),
       icon: TrendingUp,
       color: 'text-green-400',
       bg: 'bg-green-400/10',

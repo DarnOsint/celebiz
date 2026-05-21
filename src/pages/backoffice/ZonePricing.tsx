@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { ArrowLeft, Save } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 import { useToast } from '../../context/ToastContext'
 
 interface MenuItem {
@@ -149,7 +150,7 @@ export default function ZonePricing({ onBack }: Props) {
                       Item
                     </th>
                     <th className="text-left text-gray-400 text-xs uppercase tracking-wide px-4 py-3 font-medium">
-                      Base ₦
+                      Base (SSP)
                     </th>
                     {zones.map((zone) => (
                       <th
@@ -172,7 +173,7 @@ export default function ZonePricing({ onBack }: Props) {
                         <p className="text-gray-500 text-xs">{item.menu_categories?.name}</p>
                       </td>
                       <td className="px-4 py-3 text-amber-400 text-sm font-bold">
-                        ₦{item.price.toLocaleString()}
+                        {formatPrice(item.price)}
                       </td>
                       {zones.map((zone) => (
                         <td key={zone.id} className="px-4 py-3">

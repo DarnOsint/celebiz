@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Trophy, RefreshCw, Download, Printer } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
+import { formatPrice } from '../../../lib/currency'
 
 type Period = 'today' | 'week' | 'month' | 'quarter'
 
@@ -133,23 +134,23 @@ export default function StaffPerformanceTab() {
       div,
       r('Period:', label),
       r('Staff Count:', String(rows.length)),
-      r('Total Revenue:', `N${totalRevenue.toLocaleString()}`),
+      r('Total Revenue:', formatPrice(totalRevenue)),
       r('Total Orders:', String(totalOrders)),
       div,
       '',
       ...rows.map((row, i) => {
         const pct = totalRevenue ? Math.round((row.revenue / totalRevenue) * 100) : 0
         return [
-          r(`${i + 1}. ${row.name}`, `N${row.revenue.toLocaleString()}`),
+          r(`${i + 1}. ${row.name}`, formatPrice(row.revenue)),
           r(
             `   ${row.orders} orders · ${row.items} items`,
-            `avg N${row.avgOrder.toLocaleString()} · ${pct}%`
+            `avg ${formatPrice(row.avgOrder)} · ${pct}%`
           ),
           '',
         ].join('\n')
       }),
       sol,
-      r('TOTAL:', `N${totalRevenue.toLocaleString()}`),
+      r('TOTAL:', formatPrice(totalRevenue)),
       sol,
       '',
       ctr('*** END ***'),
@@ -220,7 +221,7 @@ export default function StaffPerformanceTab() {
         {[
           {
             label: 'Total Revenue',
-            value: `₦${totalRevenue.toLocaleString()}`,
+            value: formatPrice(totalRevenue),
             color: 'text-amber-400',
           },
           { label: 'Total Orders', value: totalOrders, color: 'text-white' },
@@ -280,10 +281,10 @@ export default function StaffPerformanceTab() {
                     <td className="text-gray-300 text-right px-2 py-2.5">{r.orders}</td>
                     <td className="text-blue-400 text-right px-2 py-2.5">{r.items}</td>
                     <td className="text-amber-400 text-right px-3 py-2.5 font-bold">
-                      ₦{r.revenue.toLocaleString()}
+                      {formatPrice(r.revenue)}
                     </td>
                     <td className="text-gray-400 text-right px-2 py-2.5 text-xs">
-                      ₦{r.avgOrder.toLocaleString()}
+                      {formatPrice(r.avgOrder)}
                     </td>
                     <td className="text-right px-2 py-2.5">
                       <div className="flex items-center justify-end gap-1.5">
@@ -306,11 +307,9 @@ export default function StaffPerformanceTab() {
                 <td className="text-white px-3 py-2">TOTAL</td>
                 <td className="text-white text-right px-2 py-2">{totalOrders}</td>
                 <td className="text-blue-400 text-right px-2 py-2">{totalItems}</td>
-                <td className="text-amber-400 text-right px-3 py-2">
-                  ₦{totalRevenue.toLocaleString()}
-                </td>
+                <td className="text-amber-400 text-right px-3 py-2">{formatPrice(totalRevenue)}</td>
                 <td className="text-gray-400 text-right px-2 py-2 text-xs">
-                  ₦{totalOrders ? Math.round(totalRevenue / totalOrders).toLocaleString() : 0}
+                  {formatPrice(totalOrders ? Math.round(totalRevenue / totalOrders) : 0)}
                 </td>
                 <td className="px-2 py-2"></td>
               </tr>

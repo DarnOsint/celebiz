@@ -6,6 +6,7 @@ import ReceiptModal from '../pos/ReceiptModal'
 import type { LedgerEntry, PayoutRow } from './types'
 import type { Order, OrderItem, Table } from '../../types'
 import { getNetOrderAmount, getValidOrderItemCount, getValidOrderItems } from './orderAmounts'
+import { formatPrice } from '../../lib/currency'
 
 type LedgerFilterMode = 'prev-day' | 'single' | 'range'
 
@@ -26,7 +27,7 @@ type LedgerPayoutEntry = LedgerEntry & {
 
 type LedgerRecord = LedgerOrderEntry | LedgerPayoutEntry
 
-const formatMoney = (amount: number) => `₦${Number(amount || 0).toLocaleString()}`
+const formatMoney = (amount: number) => formatPrice(amount)
 const toDateInput = (value: Date) => value.toISOString().slice(0, 10)
 const sessionStart = (value: string) => {
   const date = new Date(`${value}T08:00:00`)

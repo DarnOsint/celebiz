@@ -1,3 +1,5 @@
+import { formatPrice } from '../../../lib/currency'
+
 export interface Room {
   id: string
   room_number: number
@@ -98,10 +100,8 @@ export const PAYMENT_METHODS = [
   { value: 'credit', label: 'Credit Account' },
 ] as const
 
-export const fmt = (n: number | null | undefined) =>
-  '₦' + Number(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })
-export const fmtShort = (n: number | null | undefined) =>
-  '₦' + Number(n || 0).toLocaleString('en-NG')
+export const fmt = (n: number | null | undefined) => formatPrice(n ?? 0)
+export const fmtShort = (n: number | null | undefined) => formatPrice(n ?? 0)
 export const fmtDate = (d: string | null | undefined) =>
   d
     ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })

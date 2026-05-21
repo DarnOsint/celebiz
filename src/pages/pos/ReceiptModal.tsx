@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { isNetworkPrinterAvailable, printViaNetwork } from '../../lib/networkPrinter'
+import { formatPrice } from '../../lib/currency'
 import { buildReceipt } from '../../hooks/useThermalPrinter'
 import { X, Printer, Download } from 'lucide-react'
 import type { Order, OrderItem, Table } from '../../types'
@@ -501,10 +502,10 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                     </span>
                     <span style={{ width: '24px', textAlign: 'center' }}>{item.quantity}</span>
                     <span style={{ width: '48px', textAlign: 'right' }}>
-                      ₦{item.unit_price?.toLocaleString()}
+                      {formatPrice(item.unit_price || 0)}
                     </span>
                     <span style={{ width: '64px', textAlign: 'right' }}>
-                      ₦{(item as unknown as { total_price?: number }).total_price?.toLocaleString()}
+                      {formatPrice((item as unknown as { total_price?: number }).total_price || 0)}
                     </span>
                   </div>
                 ))}
@@ -526,11 +527,11 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                           item.id}{' '}
                         [RETURNED]
                       </span>
-                      <span style={{ width: '64px', textAlign: 'right' }}>₦0</span>
+                      <span style={{ width: '64px', textAlign: 'right' }}>{formatPrice(0)}</span>
                     </div>
                   ))}
                 <div style={{ borderTop: '2px solid #000', margin: '6px 0' }} />
-                {[['Subtotal', `₦${subtotal.toLocaleString()}`]].map(([l, v]) => (
+                {[['Subtotal', formatPrice(subtotal)]].map(([l, v]) => (
                   <div
                     key={l}
                     style={{
@@ -555,13 +556,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                   }}
                 >
                   <span>TOTAL</span>
-                  <span>
-                    ₦
-                    {total.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
+                  <span>{formatPrice(total)}</span>
                 </div>
                 {tipAmount > 0 && (
                   <>
@@ -576,16 +571,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                     >
                       <span>Amount Received</span>
                       <span>
-                        ₦
-                        {amountReceived > 0
-                          ? amountReceived.toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })
-                          : (total + tipAmount).toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
+                        {formatPrice(amountReceived > 0 ? amountReceived : total + tipAmount)}
                       </span>
                     </div>
                     <div
@@ -599,13 +585,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                       }}
                     >
                       <span>💚 Tip (Thank you!)</span>
-                      <span>
-                        ₦
-                        {tipAmount.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </span>
+                      <span>{formatPrice(tipAmount)}</span>
                     </div>
                   </>
                 )}
@@ -749,7 +729,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                     </div>
                   ))}
                 <div style={{ borderTop: '2px solid #000', margin: '6px 0' }} />
-                {[['Subtotal', `₦${subtotal.toLocaleString()}`]].map(([l, v]) => (
+                {[['Subtotal', formatPrice(subtotal)]].map(([l, v]) => (
                   <div
                     key={l}
                     style={{
@@ -773,13 +753,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                   }}
                 >
                   <span>TOTAL CHARGED</span>
-                  <span>
-                    ₦
-                    {total.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
+                  <span>{formatPrice(total)}</span>
                 </div>
                 {tipAmount > 0 && (
                   <>
@@ -794,11 +768,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                     >
                       <span>Amount Received</span>
                       <span>
-                        ₦
-                        {(amountReceived > 0 ? amountReceived : total + tipAmount).toLocaleString(
-                          undefined,
-                          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-                        )}
+                        {formatPrice(amountReceived > 0 ? amountReceived : total + tipAmount)}
                       </span>
                     </div>
                     <div
@@ -811,13 +781,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                       }}
                     >
                       <span>TIP RECEIVED</span>
-                      <span>
-                        ₦
-                        {tipAmount.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </span>
+                      <span>{formatPrice(tipAmount)}</span>
                     </div>
                   </>
                 )}

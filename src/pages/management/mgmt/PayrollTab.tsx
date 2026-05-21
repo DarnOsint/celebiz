@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { DollarSign, RefreshCw, Save, Plus, Printer, Download, X, UserPlus } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
+import { formatPrice } from '../../../lib/currency'
 import { useAuth } from '../../../context/AuthContext'
 import { useToast } from '../../../context/ToastContext'
 import { audit } from '../../../lib/audit'
@@ -410,7 +411,6 @@ export default function PayrollTab() {
       return left + ' '.repeat(Math.max(1, W - left.length - rv.length)) + rv
     }
     const ctr = (s: string) => ' '.repeat(Math.max(0, Math.floor((W - s.length) / 2))) + s
-    const fmt = (n: number) => 'N' + n.toLocaleString()
     const lines = [
       '',
       ctr('CELEBIZ'),
@@ -419,10 +419,10 @@ export default function PayrollTab() {
       r('Month:', monthLabel(month)),
       r('Staff Count:', String(rows.length)),
       div,
-      r('Total Base Salary:', fmt(totalBase)),
-      r('Total Outstanding:', fmt(totalOutstanding)),
-      r('Total Docking:', fmt(totalDocking)),
-      r('Total Net Pay:', fmt(totalNet)),
+      r('Total Base Salary:', formatPrice(totalBase)),
+      r('Total Outstanding:', formatPrice(totalOutstanding)),
+      r('Total Docking:', formatPrice(totalDocking)),
+      r('Total Net Pay:', formatPrice(totalNet)),
       div,
       '',
       ...rows.map((row) => {
@@ -432,11 +432,14 @@ export default function PayrollTab() {
           r(m.staff_name, `(${m.role})`),
           r(`  Days: ${m.days_worked}/${m.total_days}`, `Bank: ${m.bank_name || '—'}`),
           r(`  Acct: ${m.account_number || '—'}`, ''),
-          r(`  Base: ${fmt(m.base_salary)}`, `Outst: ${fmt(outTotal)}`),
+          r(`  Base: ${formatPrice(m.base_salary)}`, `Outst: ${formatPrice(outTotal)}`),
           (m.auto_outstanding || 0) > 0
-            ? r(`  Auto: ${fmt(m.auto_outstanding || 0)}`, `Manual: ${fmt(m.outstanding || 0)}`)
+            ? r(
+                `  Auto: ${formatPrice(m.auto_outstanding || 0)}`,
+                `Manual: ${formatPrice(m.outstanding || 0)}`
+              )
             : '',
-          r(`  Dock: ${fmt(m.docking)}`, `NET: ${fmt(netPay(m))}`),
+          r(`  Dock: ${formatPrice(m.docking)}`, `NET: ${formatPrice(netPay(m))}`),
           '',
         ].join('\n')
       }),
@@ -544,18 +547,18 @@ export default function PayrollTab() {
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {[
-          { label: 'Total Base', value: `₦${totalBase.toLocaleString()}`, color: 'text-white' },
+          { label: 'Total Base', value: formatPrice(totalBase), color: 'text-white' },
           {
             label: 'Outstanding',
-            value: `₦${totalOutstanding.toLocaleString()}`,
+            value: formatPrice(totalOutstanding),
             color: totalOutstanding > 0 ? 'text-red-400' : 'text-gray-400',
           },
           {
             label: 'Docking',
-            value: `₦${totalDocking.toLocaleString()}`,
+            value: formatPrice(totalDocking),
             color: totalDocking > 0 ? 'text-amber-400' : 'text-gray-400',
           },
-          { label: 'Net Payable', value: `₦${totalNet.toLocaleString()}`, color: 'text-green-400' },
+          { label: 'Net Payable', value: formatPrice(totalNet), color: 'text-green-400' },
         ].map((k) => (
           <div
             key={k.label}
@@ -687,13 +690,12 @@ export default function PayrollTab() {
                         />
                         {(m.auto_outstanding || 0) > 0 && (
                           <span className="text-[10px] text-gray-500 text-right">
-                            auto ₦{(m.auto_outstanding || 0).toLocaleString()}
+                            auto {formatPrice(m.auto_outstanding || 0)}
                           </span>
                         )}
                         {(m.outstanding || 0) + (m.auto_outstanding || 0) > 0 && (
                           <span className="text-[10px] text-gray-400 text-right">
-                            total ₦
-                            {((m.outstanding || 0) + (m.auto_outstanding || 0)).toLocaleString()}
+                            total {formatPrice((m.outstanding || 0) + (m.auto_outstanding || 0))}
                           </span>
                         )}
                       </div>
@@ -712,7 +714,7 @@ export default function PayrollTab() {
                     <td
                       className={`text-right px-3 py-2 font-bold ${net > 0 ? 'text-green-400' : 'text-gray-500'}`}
                     >
-                      ₦{net.toLocaleString()}
+                      {formatPrice(net)}
                     </td>
                   </tr>
                 )
@@ -723,16 +725,12 @@ export default function PayrollTab() {
                 <td className="text-white px-3 py-2" colSpan={5}>
                   TOTAL ({rows.length} staff)
                 </td>
-                <td className="text-white text-right px-2 py-2">₦{totalBase.toLocaleString()}</td>
+                <td className="text-white text-right px-2 py-2">{formatPrice(totalBase)}</td>
                 <td className="text-red-400 text-right px-2 py-2">
-                  ₦{totalOutstanding.toLocaleString()}
+                  {formatPrice(totalOutstanding)}
                 </td>
-                <td className="text-amber-400 text-right px-2 py-2">
-                  ₦{totalDocking.toLocaleString()}
-                </td>
-                <td className="text-green-400 text-right px-3 py-2">
-                  ₦{totalNet.toLocaleString()}
-                </td>
+                <td className="text-amber-400 text-right px-2 py-2">{formatPrice(totalDocking)}</td>
+                <td className="text-green-400 text-right px-3 py-2">{formatPrice(totalNet)}</td>
               </tr>
             </tfoot>
           </table>
@@ -785,7 +783,7 @@ export default function PayrollTab() {
               />
               <input
                 type="number"
-                placeholder="Monthly Salary (₦)"
+                placeholder="Monthly Salary (SSP)"
                 value={newStaff.salary}
                 onChange={(e) => setNewStaff((p) => ({ ...p, salary: e.target.value }))}
                 className="w-full bg-gray-900 border border-gray-800 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500"

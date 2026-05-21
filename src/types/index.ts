@@ -248,14 +248,6 @@ export interface CvShelfEvent {
   created_at: string
 }
 
-// ─── Hook return types ────────────────────────────────────────────────────
-
-export interface GeofenceResult {
-  status: 'checking' | 'inside' | 'outside' | 'error' | 'unsupported'
-  distance: number | null
-  location: { lat: number; lng: number } | null
-}
-
 export interface SyncStatus {
   status: 'online' | 'offline' | 'syncing' | 'partial'
   pending: number

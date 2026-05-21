@@ -1,3 +1,4 @@
+import { formatPrice } from '../../lib/currency'
 import type { StayRow } from './types'
 
 interface Props {
@@ -34,7 +35,7 @@ export default function ActiveStaysTab({ stays }: Props) {
                 </div>
                 <div className="text-right">
                   <p className="text-white font-bold text-xl">
-                    ₦{stay.total_amount?.toLocaleString()}
+                    {formatPrice(stay.total_amount || 0)}
                   </p>
                   <p className="text-gray-500 text-xs capitalize">{stay.payment_method}</p>
                 </div>
@@ -65,7 +66,7 @@ export default function ActiveStaysTab({ stays }: Props) {
                     }),
                   },
                   { label: 'Nights', value: stay.nights },
-                  { label: 'Rate/Night', value: `₦${stay.rate_per_night?.toLocaleString()}` },
+                  { label: 'Rate/Night', value: formatPrice(stay.rate_per_night || 0) },
                   { label: 'ID Type', value: stay.id_type },
                   { label: 'ID Number', value: stay.id_number },
                 ].map((f) => (

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Refrigerator, Plus, RefreshCw, Printer, X } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
+import { formatPrice } from '../../../lib/currency'
 import { useAuth } from '../../../context/AuthContext'
 import { useToast } from '../../../context/ToastContext'
 import { audit } from '../../../lib/audit'
@@ -164,7 +165,7 @@ export default function KitchenFridgeTab() {
 
     toast.success(
       'Recorded',
-      `${qty}x ${food.name} (₦${totalCost.toLocaleString()}) charged to ${waitron.name}`
+      `${qty}x ${food.name} (${formatPrice(totalCost)}) charged to ${waitron.name}`
     )
     setShowAdd(false)
     setForm({ item: '', waitron: '', qty: '1' })
@@ -206,12 +207,12 @@ export default function KitchenFridgeTab() {
         })
       ),
       r('Total Items:', String(totalItems)),
-      r('Total Cost:', `N${totalCost.toLocaleString()}`),
+      r('Total Cost:', formatPrice(totalCost)),
       div,
       '',
       ...entries.map((e) =>
         [
-          r(`${e.quantity}x ${e.item_name}`, `N${e.total_cost.toLocaleString()}`),
+          r(`${e.quantity}x ${e.item_name}`, formatPrice(e.total_cost)),
           `  Waitron: ${e.waitron_name}`,
           '',
         ].join('\n')
@@ -220,10 +221,10 @@ export default function KitchenFridgeTab() {
       ctr('BY WAITRON'),
       div,
       ...Object.entries(byWaitron).map(([name, v]) =>
-        r(name, `${v.count} items N${v.cost.toLocaleString()}`)
+        r(name, `${v.count} items ${formatPrice(v.cost)}`)
       ),
       sol,
-      r('TOTAL:', `N${totalCost.toLocaleString()}`),
+      r('TOTAL:', formatPrice(totalCost)),
       sol,
       '',
       ctr('*** END ***'),
@@ -304,7 +305,7 @@ export default function KitchenFridgeTab() {
           <p className="text-gray-500 text-[9px] uppercase tracking-wider">Items</p>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center">
-          <p className="text-red-400 text-xl font-bold">₦{totalCost.toLocaleString()}</p>
+          <p className="text-red-400 text-xl font-bold">{formatPrice(totalCost)}</p>
           <p className="text-gray-500 text-[9px] uppercase tracking-wider">Total Cost</p>
         </div>
       </div>
@@ -322,7 +323,7 @@ export default function KitchenFridgeTab() {
               >
                 <span className="text-gray-300 text-sm">{name}</span>
                 <span className="text-red-400 text-sm font-bold">
-                  {v.count} items · ₦{v.cost.toLocaleString()}
+                  {v.count} items · {formatPrice(v.cost)}
                 </span>
               </div>
             ))}
@@ -363,8 +364,8 @@ export default function KitchenFridgeTab() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-red-400 font-bold">₦{e.total_cost.toLocaleString()}</p>
-                <p className="text-gray-500 text-xs">₦{e.cost_price.toLocaleString()}/each</p>
+                <p className="text-red-400 font-bold">{formatPrice(e.total_cost)}</p>
+                <p className="text-gray-500 text-xs">{formatPrice(e.cost_price)}/each</p>
               </div>
             </div>
           ))}
@@ -393,7 +394,7 @@ export default function KitchenFridgeTab() {
                 <option value="">Select food item...</option>
                 {foodItems.map((f) => (
                   <option key={f.id} value={f.name}>
-                    {f.name} — ₦{f.price.toLocaleString()}
+                    {f.name} — {formatPrice(f.price)}
                   </option>
                 ))}
               </select>
@@ -420,11 +421,10 @@ export default function KitchenFridgeTab() {
               {form.item && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
                   <p className="text-red-400 font-bold">
-                    ₦
-                    {(
+                    {formatPrice(
                       (foodItems.find((f) => f.name === form.item)?.price || 0) *
-                      (parseInt(form.qty) || 1)
-                    ).toLocaleString()}
+                        (parseInt(form.qty) || 1)
+                    )}
                   </p>
                   <p className="text-gray-500 text-xs">will be charged to waitron</p>
                 </div>

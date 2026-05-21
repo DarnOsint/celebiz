@@ -3,8 +3,6 @@ import { supabase } from '../../lib/supabase'
 import { sendPushToStaff } from '../../hooks/usePushNotifications'
 import { audit } from '../../lib/audit'
 import { HelpTooltip } from '../../components/HelpTooltip'
-import { useGeofence } from '../../hooks/useGeofence'
-import GeofenceBlock from '../../components/GeofenceBlock'
 import { useAuth } from '../../context/AuthContext'
 import ErrorBoundary from '../../components/ErrorBoundary'
 import {
@@ -26,6 +24,7 @@ import StoreRequestPanel from './StoreRequestPanel'
 import type { KdsOrder } from './types'
 import DailySummaryTab from './DailySummaryTab'
 import { useToast } from '../../context/ToastContext'
+import { formatPrice } from '../../lib/currency'
 
 const BarIssueLogTab = lazy(() => import('./BarIssueLogTab'))
 
@@ -109,7 +108,6 @@ function getNextStatus(status: string): string | null {
 function BarKDSInner() {
   const { profile, signOut } = useAuth()
   const toast = useToast()
-  const { status: geoStatus, distance: geoDist, location: geoLocation } = useGeofence('main')
   const [orders, setOrders] = useState<KdsOrder[]>([])
   const [returnItems, setReturnItems] = useState<
     (KdsOrder['order_items'][0] & { tableName: string; orderId: string; staffId?: string | null })[]
@@ -625,8 +623,6 @@ function BarKDSInner() {
     }
   }, [fetchOrders, fetchReturnHistory])
 
-  if (geoStatus === 'outside')
-    return <GeofenceBlock status={geoStatus} distance={geoDist} location={geoLocation} />
   if (loading)
     return (
       <div className="min-h-full bg-gray-950 flex items-center justify-center">
@@ -848,11 +844,11 @@ function BarKDSInner() {
                   Returns — {returnHistory.length} total
                 </p>
                 <p className="text-gray-400 text-xs font-bold">
-                  ₦
-                  {returnHistory
-                    .filter((r) => r.status === 'accepted')
-                    .reduce((s, r) => s + (r.item_total || 0), 0)
-                    .toLocaleString()}{' '}
+                  {formatPrice(
+                    returnHistory
+                      .filter((r) => r.status === 'accepted')
+                      .reduce((s, r) => s + (r.item_total || 0), 0)
+                  )}{' '}
                   accepted
                 </p>
               </div>
@@ -888,9 +884,7 @@ function BarKDSInner() {
                       >
                         {r.status}
                       </span>
-                      <p className="text-gray-400 text-xs mt-1">
-                        ₦{(r.item_total || 0).toLocaleString()}
-                      </p>
+                      <p className="text-gray-400 text-xs mt-1">{formatPrice(r.item_total || 0)}</p>
                     </div>
                   </div>
                   {r.return_reason && (

@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
-import { useGeofence } from '../../hooks/useGeofence'
-import GeofenceBlock from '../../components/GeofenceBlock'
 import {
   Gamepad2,
   Plus,
@@ -16,6 +14,7 @@ import {
   Clock,
   Trash2,
 } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 
 interface GameType {
   id: string
@@ -52,7 +51,6 @@ const todayWAT = () => {
 export default function GamesMasterPage() {
   const { profile, signOut } = useAuth()
   const toast = useToast()
-  const { status: geoStatus, distance: geoDist, location: geoLocation } = useGeofence('main')
   const isManager = ['owner', 'manager'].includes(profile?.role || '')
 
   const [gameTypes, setGameTypes] = useState<GameType[]>([])
@@ -168,7 +166,7 @@ export default function GamesMasterPage() {
     })
     toast.success(
       'Sale Recorded',
-      `${qty}x ${selectedGameType.name} — ₦${(selectedGameType.price * qty).toLocaleString()} via ${waitron?.name}`
+      `${qty}x ${selectedGameType.name} — ${formatPrice(selectedGameType.price * qty)} via ${waitron?.name}`
     )
     setQuantity('1')
     setCustomerName('')
@@ -203,8 +201,6 @@ export default function GamesMasterPage() {
   const inp =
     'w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500'
 
-  if (geoStatus === 'outside')
-    return <GeofenceBlock status={geoStatus} distance={geoDist} location={geoLocation} />
   if (loading)
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
@@ -222,7 +218,7 @@ export default function GamesMasterPage() {
           <div>
             <h1 className="text-white font-bold">Games</h1>
             <p className="text-gray-400 text-xs">
-              ₦{todaySales.toLocaleString()} today · {todayCount} game{todayCount !== 1 ? 's' : ''}
+              {formatPrice(todaySales)} today · {todayCount} game{todayCount !== 1 ? 's' : ''}
             </p>
           </div>
         </div>
@@ -294,7 +290,7 @@ export default function GamesMasterPage() {
                 <option value="">Select game...</option>
                 {gameTypes.map((g) => (
                   <option key={g.id} value={g.id}>
-                    {g.name} — ₦{g.price.toLocaleString()}
+                    {g.name} — {formatPrice(g.price)}
                     {g.duration_mins ? ` (${g.duration_mins}min)` : ''}
                   </option>
                 ))}
@@ -370,7 +366,7 @@ export default function GamesMasterPage() {
                 <p className="text-emerald-400/70 text-[10px] uppercase tracking-wider mb-1">
                   Total
                 </p>
-                <p className="text-emerald-400 text-3xl font-bold">₦{saleTotal.toLocaleString()}</p>
+                <p className="text-emerald-400 text-3xl font-bold">{formatPrice(saleTotal)}</p>
               </div>
             )}
             <button
@@ -398,7 +394,7 @@ export default function GamesMasterPage() {
                       {sale.quantity}x {sale.game_name}
                     </p>
                     <p className="text-emerald-400 font-bold text-sm">
-                      ₦{sale.total_price.toLocaleString()}
+                      {formatPrice(sale.total_price)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -446,7 +442,7 @@ export default function GamesMasterPage() {
                   min="0"
                   value={configForm.price}
                   onChange={(e) => setConfigForm((p) => ({ ...p, price: e.target.value }))}
-                  placeholder="Price (₦)"
+                  placeholder="Price (SSP)"
                   className={inp}
                 />
                 <input
@@ -482,7 +478,7 @@ export default function GamesMasterPage() {
                   <div>
                     <p className="text-white text-sm font-semibold">{g.name}</p>
                     <p className="text-emerald-400 text-xs font-bold">
-                      ₦{g.price.toLocaleString()}
+                      {formatPrice(g.price)}
                       {g.duration_mins ? ` · ${g.duration_mins} min` : ''}
                     </p>
                     {g.description && <p className="text-gray-500 text-xs">{g.description}</p>}

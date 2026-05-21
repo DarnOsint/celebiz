@@ -1,3 +1,4 @@
+import { formatPrice } from '../../../lib/currency'
 import { ShoppingBag } from 'lucide-react'
 
 interface Order {
@@ -51,9 +52,7 @@ export default function RecentOrders({ orders: rawOrders }: Props) {
                 </p>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-white text-sm font-bold">
-                  ₦{order.total_amount?.toLocaleString()}
-                </p>
+                <p className="text-white text-sm font-bold">{formatPrice(order.total_amount)}</p>
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full ${
                     order.status === 'open'

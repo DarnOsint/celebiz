@@ -6,8 +6,6 @@ import DailySummaryTab from './DailySummaryTab'
 import { useToast } from '../../context/ToastContext'
 import { RefreshCw, CheckCircle, X, BarChart2, History, LogOut, Plus, Send } from 'lucide-react'
 import ErrorBoundary from '../../components/ErrorBoundary'
-import { useGeofence } from '../../hooks/useGeofence'
-import GeofenceBlock from '../../components/GeofenceBlock'
 import type { KdsOrder } from './types'
 import { sendPushToStaff } from '../../hooks/usePushNotifications'
 
@@ -77,7 +75,6 @@ const currentBusinessDateWAT = () => {
 function MixologistKDSInner() {
   const { profile, signOut } = useAuth()
   const toast = useToast()
-  const { status: geoStatus, distance: geoDist, location: geoLocation } = useGeofence('main')
   const [orders, setOrders] = useState<KdsOrder[]>([])
   const [promptOrder, setPromptOrder] = useState<KdsOrder | null>(null)
   const [promptQueue, setPromptQueue] = useState<KdsOrder[]>([])
@@ -579,9 +576,6 @@ function MixologistKDSInner() {
       supabase.removeChannel(sub)
     }
   }, [autoAcceptTodayPending, fetchOrders, fetchReturnHistory, loadRequests])
-
-  if (geoStatus === 'outside')
-    return <GeofenceBlock status={geoStatus} distance={geoDist} location={geoLocation} />
 
   if (loading) return <div className="p-6 text-amber-500">Loading...</div>
 

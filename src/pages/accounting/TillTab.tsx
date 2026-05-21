@@ -1,3 +1,4 @@
+import { formatPrice } from '../../lib/currency'
 import type { TillSession } from './types'
 
 interface Props {
@@ -39,7 +40,7 @@ export default function TillTab({ tillSessions }: Props) {
               ].map((item) => (
                 <div key={item.label} className="bg-gray-800 rounded-lg p-3">
                   <p className="text-gray-500 text-xs">{item.label}</p>
-                  <p className="text-white font-bold">₦{(item.value || 0).toLocaleString()}</p>
+                  <p className="text-white font-bold">{formatPrice(item.value || 0)}</p>
                 </div>
               ))}
             </div>

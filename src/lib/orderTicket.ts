@@ -2,6 +2,8 @@
 // Uses PLAIN TEXT only — no ESC/POS commands.
 // Compatible with every thermal printer via raw TCP socket.
 
+import { getCurrencySymbol } from './currency'
+
 export interface TicketItem {
   quantity: number
   name: string
@@ -44,7 +46,7 @@ export function buildOrderTicketText(data: OrderTicketData, opts: TicketTextOpti
   const W = 32 // 58mm printers = ~32 chars, 80mm = ~42 chars. Use 32 for safety.
   const divider = '-'.repeat(W)
   const doubleDivider = '='.repeat(W)
-  const currencySymbol = opts.currencySymbol ?? '₦'
+  const currencySymbol = opts.currencySymbol ?? getCurrencySymbol()
 
   const centre = (s: string) => {
     const pad = Math.max(0, Math.floor((W - s.length) / 2))
@@ -126,7 +128,7 @@ export function buildOrderTicketText(data: OrderTicketData, opts: TicketTextOpti
  */
 export function buildOrderTicketHTML(data: OrderTicketData): string {
   // HTML print (browser) can render the Naira glyph correctly on most devices.
-  const text = buildOrderTicketText(data, { currencySymbol: '₦' })
+  const text = buildOrderTicketText(data, { currencySymbol: getCurrencySymbol() })
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${data.station.toUpperCase()} Order</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }

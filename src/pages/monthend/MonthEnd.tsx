@@ -17,6 +17,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
+import { formatPrice } from '../../lib/currency'
 
 interface PeriodClose {
   id: string
@@ -76,7 +77,7 @@ interface DebtorPreview {
   recovered: number
 }
 
-const fmt = (n: number) => `₦${(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`
+const fmt = (n: number) => formatPrice(n)
 const fmtDate = (d: string) =>
   new Date(d).toLocaleDateString('en-NG', {
     timeZone: 'Africa/Lagos',

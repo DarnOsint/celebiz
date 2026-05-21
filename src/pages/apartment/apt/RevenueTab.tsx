@@ -104,7 +104,7 @@ export default function RevenueTab({ stays, serviceOrders, rooms }: Props) {
           {monthlyRevenue.map(({ label, rev }) => (
             <div key={label} className="flex-1 flex flex-col items-center gap-1">
               <p className="text-amber-400 text-[9px] font-bold">
-                {rev > 0 ? fmtShort(rev).replace('₦', '') : ''}
+                {rev > 0 ? fmtShort(rev).replace(/^[A-Z$]+/, '') : ''}
               </p>
               <div className="w-full bg-gray-800 rounded-t-lg relative" style={{ height: 72 }}>
                 <div

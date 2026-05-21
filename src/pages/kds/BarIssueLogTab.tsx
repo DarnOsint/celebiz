@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 
 interface IssueEntry {
   id: string
@@ -351,10 +352,10 @@ export default function BarIssueLogTab() {
                                     entry.kind === 'returned' ? 'text-red-400' : 'text-amber-400'
                                   }`}
                                 >
-                                  ₦{(entry.total_price || 0).toLocaleString()}
+                                  {formatPrice(entry.total_price || 0)}
                                 </p>
                                 <p className="text-gray-500 text-[11px]">
-                                  ₦{(entry.unit_price || 0).toLocaleString()} each
+                                  {formatPrice(entry.unit_price || 0)} each
                                 </p>
                               </div>
                             </div>

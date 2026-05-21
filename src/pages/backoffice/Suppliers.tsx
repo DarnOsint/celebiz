@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { audit } from '../../lib/audit'
 import { useToast } from '../../context/ToastContext'
+import { formatPrice } from '../../lib/currency'
 import {
   Plus,
   X,
@@ -402,8 +403,8 @@ export default function Suppliers({ onBack }: Props) {
 
       <div className="grid grid-cols-3 gap-2 p-4">
         {[
-          { label: 'Total Spend', value: '₦' + poTotal.toLocaleString(), color: 'text-white' },
-          { label: 'Unpaid Orders', value: '₦' + poUnpaid.toLocaleString(), color: 'text-red-400' },
+          { label: 'Total Spend', value: formatPrice(poTotal), color: 'text-white' },
+          { label: 'Unpaid Orders', value: formatPrice(poUnpaid), color: 'text-red-400' },
           { label: 'Pending Delivery', value: poPending, color: 'text-amber-400' },
         ].map((card) => (
           <div key={card.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
@@ -524,9 +525,7 @@ export default function Suppliers({ onBack }: Props) {
                         {po.payment_status}
                       </span>
                     </div>
-                    <p className="text-amber-400 font-bold">
-                      ₦{(po.total_cost || 0).toLocaleString()}
-                    </p>
+                    <p className="text-amber-400 font-bold">{formatPrice(po.total_cost || 0)}</p>
                     <p className="text-gray-500 text-xs mt-0.5">
                       {new Date(po.created_at).toLocaleDateString('en-NG')} · by{' '}
                       {po.ordered_by_name}
@@ -576,10 +575,10 @@ export default function Suppliers({ onBack }: Props) {
                             <td className="py-2 text-white">{item.name}</td>
                             <td className="py-2 text-right text-gray-400">{item.quantity}</td>
                             <td className="py-2 text-right text-gray-400">
-                              ₦{(item.unit_cost || 0).toLocaleString()}
+                              {formatPrice(item.unit_cost || 0)}
                             </td>
                             <td className="py-2 text-right text-amber-400 font-medium">
-                              ₦{(item.total || 0).toLocaleString()}
+                              {formatPrice(item.total || 0)}
                             </td>
                           </tr>
                         ))}
@@ -735,7 +734,7 @@ export default function Suppliers({ onBack }: Props) {
                   type="number"
                   value={poItem.unit_cost}
                   onChange={(e) => setPOItem((p) => ({ ...p, unit_cost: e.target.value }))}
-                  placeholder="Unit cost (₦) *"
+                  placeholder="Unit cost (SSP) *"
                   className="bg-gray-900 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
                 />
               </div>
@@ -756,12 +755,12 @@ export default function Suppliers({ onBack }: Props) {
                     <div>
                       <p className="text-white text-sm">{item.name}</p>
                       <p className="text-gray-500 text-xs">
-                        {item.quantity} × ₦{item.unit_cost.toLocaleString()}
+                        {item.quantity} × {formatPrice(item.unit_cost)}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <p className="text-amber-400 font-medium text-sm">
-                        ₦{item.total.toLocaleString()}
+                        {formatPrice(item.total)}
                       </p>
                       <button
                         onClick={() => removePOItem(i)}
@@ -775,7 +774,7 @@ export default function Suppliers({ onBack }: Props) {
                 <div className="flex justify-between px-4 py-2 border-t border-gray-800">
                   <span className="text-gray-400 text-sm">Total</span>
                   <span className="text-white font-bold">
-                    ₦{poForm.items.reduce((s, i) => s + i.total, 0).toLocaleString()}
+                    {formatPrice(poForm.items.reduce((s, i) => s + i.total, 0))}
                   </span>
                 </div>
               </div>

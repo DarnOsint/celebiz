@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { X, Printer, User, CheckCircle, Loader2 } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 
-const fmt = (n: number | null | undefined) =>
-  `₦${Number(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`
+const fmt = (n: number | null | undefined) => formatPrice(Number(n || 0))
 const fmtTime = (ts?: string | null) =>
   ts
     ? new Date(ts).toLocaleTimeString('en-NG', {

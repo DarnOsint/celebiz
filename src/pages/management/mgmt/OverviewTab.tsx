@@ -16,6 +16,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../../lib/supabase'
 import UnassignedCustomerOrders from '../../../components/UnassignedCustomerOrders'
+import { formatPrice } from '../../../lib/currency'
 
 interface Stats {
   openOrders: number
@@ -77,7 +78,7 @@ export default function OverviewTab({ stats, pendingCount, onTabChange }: Props)
     },
     {
       label: 'Revenue Today',
-      value: `₦${stats.todayRevenue.toLocaleString()}`,
+      value: formatPrice(stats.todayRevenue),
       icon: TrendingUp,
       color: 'text-pink-400',
       bg: 'bg-pink-400/10',

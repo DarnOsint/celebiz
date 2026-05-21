@@ -1,4 +1,5 @@
 import { X } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 import type { RoomRow, StayRow } from './types'
 
 interface Props {
@@ -28,7 +29,7 @@ export default function CheckOutModal({ room, stay, saving, onConfirm, onClose }
                 ['Checked In', new Date(stay.check_in_at).toLocaleString('en-NG')],
                 ['Due Out', new Date(stay.check_out_at).toLocaleString('en-NG')],
                 ['Nights', stay.nights],
-                ['Total Paid', `₦${stay.total_amount?.toLocaleString()}`],
+                ['Total Paid', formatPrice(stay.total_amount || 0)],
               ] as [string, string | number][]
             ).map(([label, value]) => (
               <div key={label} className="flex justify-between">

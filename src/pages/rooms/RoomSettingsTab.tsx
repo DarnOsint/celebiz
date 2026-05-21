@@ -1,4 +1,5 @@
 import { Wrench } from 'lucide-react'
+import { formatPrice } from '../../lib/currency'
 import type { RoomRow } from './types'
 
 interface Props {
@@ -28,9 +29,7 @@ export default function RoomSettingsTab({ rooms, onEditRoom }: Props) {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-amber-400 font-bold">
-                ₦{room.rate_per_night?.toLocaleString() || 0}
-              </p>
+              <p className="text-amber-400 font-bold">{formatPrice(room.rate_per_night || 0)}</p>
               <p className="text-gray-600 text-xs">per night</p>
             </div>
             <button onClick={() => onEditRoom(room)} className="text-gray-400 hover:text-white p-2">

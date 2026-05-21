@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import type { WaitronStat } from './types'
+import { formatPrice, getCurrencySymbol } from '../../lib/currency'
 
 interface Props {
   waitronStats: WaitronStat[]
@@ -30,10 +31,10 @@ export default function StaffTab({ waitronStats }: Props) {
                     <td className="px-2 py-2 text-white font-medium">{w.name}</td>
                     <td className="px-2 py-2 text-gray-300 text-right">{w.orders}</td>
                     <td className="px-2 py-2 text-amber-400 text-right font-bold">
-                      ₦{w.revenue.toLocaleString()}
+                      {formatPrice(w.revenue)}
                     </td>
                     <td className="px-2 py-2 text-gray-400 text-right">
-                      ₦{Math.round(w.revenue / w.orders).toLocaleString()}
+                      {formatPrice(Math.round(w.revenue / w.orders))}
                     </td>
                     <td className="px-3 py-2 text-gray-500 text-right">
                       {totalRev ? Math.round((w.revenue / totalRev) * 100) : 0}%
@@ -51,7 +52,7 @@ export default function StaffTab({ waitronStats }: Props) {
                   {waitronStats.reduce((s, w) => s + w.orders, 0)}
                 </td>
                 <td className="px-2 py-2 text-right text-amber-400">
-                  ₦{waitronStats.reduce((s, w) => s + w.revenue, 0).toLocaleString()}
+                  {formatPrice(waitronStats.reduce((s, w) => s + w.revenue, 0))}
                 </td>
                 <td className="px-2 py-2" colSpan={2}></td>
               </tr>
@@ -72,7 +73,7 @@ export default function StaffTab({ waitronStats }: Props) {
               <XAxis dataKey="name" tick={{ fill: '#6b7280', fontSize: 10 }} />
               <YAxis
                 tick={{ fill: '#6b7280', fontSize: 9 }}
-                tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`}
+                tickFormatter={(v) => `${getCurrencySymbol()}${(v / 1000).toFixed(0)}k`}
               />
               <Tooltip
                 contentStyle={{
@@ -80,7 +81,7 @@ export default function StaffTab({ waitronStats }: Props) {
                   border: '1px solid #374151',
                   borderRadius: '8px',
                 }}
-                formatter={(v: number) => [`₦${v.toLocaleString()}`, 'Revenue']}
+                formatter={(v: number) => [formatPrice(v), 'Revenue']}
               />
               <Bar dataKey="revenue" fill="#f59e0b" radius={[4, 4, 0, 0]} />
             </BarChart>

@@ -11,7 +11,7 @@ import RevenueChart from './exec/RevenueChart'
 import QuickActions from './exec/QuickActions'
 import RecentOrders from './exec/RecentOrders'
 import CctvPanel from './exec/CctvPanel'
-import GeofenceControls from './exec/GeofenceControls'
+import CurrencySelector from './exec/CurrencySelector'
 
 import type { Stats, TrendDay, CvData } from './exec/types'
 import type { PostgrestFilterBuilder } from '@supabase/postgrest-js'
@@ -45,12 +45,6 @@ const HELP_TIPS = [
     title: 'Live KPI Cards',
     description:
       "Six real-time metrics: today's revenue, open orders, occupied tables, occupied rooms, staff on duty, and low stock count. All cards refresh every 30 seconds and instantly on any database change. Staff on duty is deduplicated — one person always counts as one even if clocked in multiple times.",
-  },
-  {
-    id: 'exec-geofence',
-    title: 'Geofence Control',
-    description:
-      "Toggle GPS boundary enforcement for all floor staff. When ON, staff can only use the POS from within the restaurant's physical boundary. Owners and managers are always exempt. Use Radius to set separate boundaries for the Main venue and Apartments. The boundary is off by default — enable it deliberately once your GPS coordinates are configured.",
   },
   {
     id: 'exec-bank',
@@ -93,15 +87,6 @@ const HELP_TIPS = [
 export default function Executive() {
   const { profile } = useAuth()
   const navigate = useNavigate()
-
-  // Settings state (lifted here so GeofenceControls can be stateless on the save actions)
-  const [geofenceEnabled, setGeofenceEnabled] = useState(true)
-  const [radiusMain, setRadiusMain] = useState(400)
-  const [radiusApartment, setRadiusApartment] = useState(200)
-  const [latMain, setLatMain] = useState('7.350834')
-  const [lngMain, setLngMain] = useState('3.840780')
-  const [latApartment, setLatApartment] = useState('7.349545')
-  const [lngApartment, setLngApartment] = useState('3.839690')
 
   const [stats, setStats] = useState<Stats>({
     revenue: 0,
@@ -283,30 +268,10 @@ export default function Executive() {
     supabase
       .from('settings')
       .select('id, value')
-      .in('id', [
-        'geofence_enabled',
-        'geofence_radius_main',
-        'geofence_radius_apartment',
-        'geofence_lat_main',
-        'geofence_lng_main',
-        'geofence_lat_apartment',
-        'geofence_lng_apartment',
-        'bank_name',
-        'bank_account_number',
-        'bank_account_name',
-      ])
+      .in('id', ['bank_name', 'bank_account_number', 'bank_account_name'])
       .then(({ data }) => {
         if (!data) return
         const map = Object.fromEntries(data.map((r) => [r.id, r.value]))
-        if (map['geofence_enabled'] !== undefined)
-          setGeofenceEnabled(map['geofence_enabled'] === 'true')
-        if (map['geofence_radius_main']) setRadiusMain(parseInt(map['geofence_radius_main']))
-        if (map['geofence_radius_apartment'])
-          setRadiusApartment(parseInt(map['geofence_radius_apartment']))
-        if (map['geofence_lat_main']) setLatMain(map['geofence_lat_main'])
-        if (map['geofence_lng_main']) setLngMain(map['geofence_lng_main'])
-        if (map['geofence_lat_apartment']) setLatApartment(map['geofence_lat_apartment'])
-        if (map['geofence_lng_apartment']) setLngApartment(map['geofence_lng_apartment'])
       })
     const ch = supabase
       .channel('executive-realtime')
@@ -411,28 +376,9 @@ export default function Executive() {
       </div>
 
       <div className="p-4 md:p-6">
-        <GeofenceControls
-          stats={stats}
-          geofenceEnabled={geofenceEnabled}
-          setGeofenceEnabled={setGeofenceEnabled}
-          radiusMain={radiusMain}
-          setRadiusMain={setRadiusMain}
-          radiusApartment={radiusApartment}
-          setRadiusApartment={setRadiusApartment}
-          latMain={latMain}
-          setLatMain={setLatMain}
-          lngMain={lngMain}
-          setLngMain={setLngMain}
-          latApartment={latApartment}
-          setLatApartment={setLatApartment}
-          lngApartment={lngApartment}
-          setLngApartment={setLngApartment}
-          peakHour={peakHour}
-          onNavigateBackoffice={() => navigate('/backoffice')}
-        />
-
         {cvTab && <CctvPanel cvData={cvData} onResolve={resolveAlert} />}
 
+        <CurrencySelector />
         <StatCards stats={stats} />
         <RevenueChart trendData={trendData} />
         <QuickActions />

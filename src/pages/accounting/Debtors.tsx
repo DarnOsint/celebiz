@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { audit } from '../../lib/audit'
+import { formatPrice } from '../../lib/currency'
 import {
   ArrowLeft,
   Plus,
@@ -376,7 +377,7 @@ export default function Debtors({ onBack, embedded = false }: Props) {
         <div className="flex items-center justify-between">
           <p className="text-gray-400 text-sm">
             Total outstanding:{' '}
-            <span className="text-red-400 font-bold">₦{totalOutstanding.toLocaleString()}</span>
+            <span className="text-red-400 font-bold">{formatPrice(totalOutstanding)}</span>
           </p>
           {embedded && canEdit && (
             <button
@@ -470,17 +471,17 @@ export default function Debtors({ onBack, embedded = false }: Props) {
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-red-400 font-bold">
-                        ₦{(debtor.current_balance || 0).toLocaleString()}
+                        {formatPrice(debtor.current_balance || 0)}
                       </p>
                       <p className="text-gray-500 text-xs">
-                        of ₦{(debtor.credit_limit || 0).toLocaleString()}
+                        of {formatPrice(debtor.credit_limit || 0)}
                       </p>
                     </div>
                   </div>
                   {debtor.credit_limit > 0 && (
                     <div className="mt-3">
                       <div className="flex justify-between text-xs text-gray-500 mb-1">
-                        <span>Paid: ₦{(debtor.amount_paid || 0).toLocaleString()}</span>
+                        <span>Paid: {formatPrice(debtor.amount_paid || 0)}</span>
                         <span>{pct}%</span>
                       </div>
                       <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
@@ -570,7 +571,7 @@ export default function Debtors({ onBack, embedded = false }: Props) {
                             >
                               <div>
                                 <p className="text-white text-sm font-medium">
-                                  ₦{pmt.amount.toLocaleString()}
+                                  {formatPrice(pmt.amount)}
                                 </p>
                                 <p className="text-gray-500 text-xs capitalize">
                                   {pmt.payment_method?.replace('_', ' ')} · {pmt.recorded_by_name}
@@ -650,7 +651,7 @@ export default function Debtors({ onBack, embedded = false }: Props) {
               </div>
               <div>
                 <label className="text-gray-400 text-xs uppercase tracking-wide block mb-1">
-                  Amount Owed (₦) *
+                  Amount Owed (SSP) *
                 </label>
                 <input
                   type="number"
@@ -703,8 +704,8 @@ export default function Debtors({ onBack, embedded = false }: Props) {
               <div>
                 <h3 className="text-white font-bold">Record Payment</h3>
                 <p className="text-gray-400 text-xs mt-0.5">
-                  {showPaymentModal.name} · Balance: ₦{' '}
-                  {(showPaymentModal.current_balance || 0).toLocaleString()}
+                  {showPaymentModal.name} · Balance:{' '}
+                  {formatPrice(showPaymentModal.current_balance || 0)}
                 </p>
               </div>
               <button
@@ -717,7 +718,7 @@ export default function Debtors({ onBack, embedded = false }: Props) {
             <div className="p-5 space-y-4">
               <div>
                 <label className="text-gray-400 text-xs uppercase tracking-wide block mb-1">
-                  Amount (₦) *
+                  Amount (SSP) *
                 </label>
                 <input
                   type="number"
