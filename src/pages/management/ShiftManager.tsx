@@ -87,35 +87,38 @@ export default function ShiftManager({ onClose, onRefreshStats }: Props) {
     if (data) setStaff(data)
   }
   const fetchActiveShifts = async () => {
-    const makeQuery = (columns: string) =>
-      supabase
-        .from('attendance')
-        .select(columns)
-        .or('clock_out.is.null')
-        .order('clock_in', { ascending: true })
+    const { data, error } = await supabase
+      .from('attendance')
+      .select(
+        'id, staff_id, profiles!attendance_staff_id_fkey(full_name, role), clock_in, pos_machine'
+      )
+      .or('clock_out.is.null')
+      .order('clock_in', { ascending: true })
 
-    // Some deployments may have column-level privileges on attendance (RLS/GRANT).
-    // Try richer payload first, then fall back to minimal columns if blocked.
-    const full = await makeQuery('id, staff_id, staff_name, role, clock_in, pos_machine')
-    const res = full.error ? await makeQuery('id, staff_id, staff_name, role, clock_in') : full
-
-    if (full.error) {
-      console.warn('ShiftManager: falling back to minimal attendance columns', full.error.message)
+    if (error) {
+      toast.error('Error', 'Could not load active shifts: ' + error.message)
+      return
     }
 
-    if (res.data) {
+    if (data) {
+      const mapped = data.map((row: any) => ({
+        id: row.id,
+        staff_id: row.staff_id,
+        staff_name: row.profiles?.full_name || 'Unknown',
+        role: row.profiles?.role || 'unknown',
+        clock_in: row.clock_in,
+        pos_machine: row.pos_machine,
+      })) as Shift[]
+
       // Deduplicate by staff_id — keep the most recent row per staff
-      // (guards against duplicate clock-ins that slipped through before the live-check fix)
-      const seen = new Map<string, any>()
-      for (const row of res.data) {
-        const existing = seen.get(row.staff_id)
-        if (!existing || new Date(row.clock_in) > new Date(existing.clock_in)) {
-          seen.set(row.staff_id, row)
+      const seen = new Map<string, Shift>()
+      for (const shift of mapped) {
+        const existing = seen.get(shift.staff_id)
+        if (!existing || new Date(shift.clock_in) > new Date(existing.clock_in)) {
+          seen.set(shift.staff_id, shift)
         }
       }
       setActiveShifts(Array.from(seen.values()))
-    } else if (res.error) {
-      toast.error('Error', 'Could not load active shifts: ' + res.error.message)
     }
   }
   const fetchTodayLog = async (d?: string) => {
@@ -130,34 +133,29 @@ export default function ShiftManager({ onClose, onRefreshStats }: Props) {
       effective = prev.toLocaleDateString('en-CA')
     }
     const { start, end } = watDayRange(effective)
-    const full = await supabase
+    const { data: attendanceData, error: attendanceError } = await supabase
       .from('attendance')
-      .select('id, staff_id, staff_name, role, clock_in, clock_out, pos_machine')
+      .select(
+        'id, staff_id, profiles!attendance_staff_id_fkey(full_name, role), clock_in, clock_out, pos_machine'
+      )
       .gte('clock_in', start.toISOString())
       .lt('clock_in', end.toISOString())
       .order('clock_in', { ascending: false })
 
-    const res = full.error
-      ? await supabase
-          .from('attendance')
-          .select('id, staff_id, staff_name, role, clock_in, clock_out')
-          .gte('clock_in', start.toISOString())
-          .lt('clock_in', end.toISOString())
-          .order('clock_in', { ascending: false })
-      : full
-
-    if (full.error) {
-      console.warn(
-        'ShiftManager log: falling back to minimal attendance columns',
-        full.error.message
-      )
-    }
-    if (res.error) {
-      toast.error('Error', 'Could not load shift log: ' + res.error.message)
+    if (attendanceError) {
+      toast.error('Error', 'Could not load shift log: ' + attendanceError.message)
       return
     }
 
-    const baseLog = (res.data || []) as Shift[]
+    const baseLog: Shift[] = (attendanceData || []).map((row: any) => ({
+      id: row.id,
+      staff_id: row.staff_id,
+      staff_name: row.profiles?.full_name || 'Unknown',
+      role: row.profiles?.role || 'unknown',
+      clock_in: row.clock_in,
+      clock_out: row.clock_out,
+      pos_machine: row.pos_machine,
+    }))
     const seen = new Set(baseLog.map((x) => x.staff_id).filter(Boolean))
 
     // Also include staff who made sales in this window even if attendance row is missing.
@@ -224,12 +222,7 @@ export default function ShiftManager({ onClose, onRefreshStats }: Props) {
     const posMachine = selectedPos[member.id] || null
     const { error } = await supabase.from('attendance').insert({
       staff_id: member.id,
-      staff_name: member.full_name,
-      role: member.role,
       clock_in: new Date().toISOString(),
-      date: todayWAT(),
-      recorded_by: profile?.id,
-      recorded_by_name: profile?.full_name,
       pos_machine: posMachine,
     })
     if (error) {
