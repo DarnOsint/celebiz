@@ -479,7 +479,6 @@ export default function PayrollTab() {
     'hypeman',
     'games_master',
     'shisha_attendant',
-    'apartment_manager',
     'social_media_manager',
   ]
 

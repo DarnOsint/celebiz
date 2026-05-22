@@ -18,8 +18,6 @@ interface Stats {
   openOrders: number
   occupiedTables: number
   totalTables: number
-  occupiedRooms: number
-  totalRooms: number
   staffOnDuty: number
   lowStock: number
 }
@@ -57,7 +55,7 @@ const HELP_TIPS = [
     id: 'exec-kpis',
     title: 'Live KPI Cards',
     description:
-      "Six real-time metrics: today's revenue, open orders, occupied tables, occupied rooms, staff on duty, and low stock count. All cards refresh every 30 seconds and instantly on any database change. Staff on duty is deduplicated — one person always counts as one even if clocked in multiple times.",
+      "Five real-time metrics: today's revenue, open orders, occupied tables, staff on duty, and low stock count. All cards refresh every 30 seconds and instantly on any database change. Staff on duty is deduplicated — one person always counts as one even if clocked in multiple times.",
   },
   {
     id: 'exec-bank',
@@ -81,7 +79,7 @@ const HELP_TIPS = [
     id: 'exec-quickactions',
     title: 'Quick Actions',
     description:
-      'Shortcut tiles to Accounting, Reports, Back Office, Management, Rooms, and Analytics. Use these instead of navigating through the sidebar.',
+      'Shortcut tiles to Accounting, Reports, Back Office, and Management. Use these instead of navigating through the sidebar.',
   },
   {
     id: 'exec-peak',
@@ -100,8 +98,6 @@ export default function Executive() {
     openOrders: 0,
     occupiedTables: 0,
     totalTables: 0,
-    occupiedRooms: 0,
-    totalRooms: 0,
     staffOnDuty: 0,
     lowStock: 0,
   })
@@ -118,11 +114,10 @@ export default function Executive() {
   const fetchStats = useCallback(async () => {
     void supabase.rpc('free_orphaned_tables')
     const { sessionStart, sessionEnd, sessionStartIso } = getSessionWindow()
-    const [ordersRes, tablesRes, roomsRes, shiftsRes, stockRes, recentRes, revenueRes, trendRes] =
+    const [ordersRes, tablesRes, shiftsRes, stockRes, recentRes, revenueRes, trendRes] =
       await Promise.all([
         supabase.from('orders').select('id').eq('status', 'open'),
         supabase.from('tables').select('status'),
-        supabase.from('rooms').select('status'),
         supabase.from('attendance').select('staff_id').or('clock_out.is.null'),
         supabase.from('inventory').select('id, current_stock, minimum_stock').eq('is_active', true),
         supabase
@@ -165,8 +160,6 @@ export default function Executive() {
       openOrders: ordersRes.data?.length || 0,
       occupiedTables: tablesRes.data?.filter((t) => t.status === 'occupied').length || 0,
       totalTables: tablesRes.data?.length || 0,
-      occupiedRooms: roomsRes.data?.filter((r) => r.status === 'occupied').length || 0,
-      totalRooms: roomsRes.data?.length || 0,
       staffOnDuty: new Set((shiftsRes.data || []).map((r: { staff_id: string }) => r.staff_id))
         .size,
       lowStock: stockRes.data?.filter((i) => i.current_stock <= i.minimum_stock).length || 0,
@@ -281,12 +274,6 @@ export default function Executive() {
         scheduleFetchStats(8000)
       )
       .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, () =>
-        scheduleFetchStats(8000)
-      )
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () =>
-        scheduleFetchStats(8000)
-      )
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'room_stays' }, () =>
         scheduleFetchStats(8000)
       )
       .subscribe()

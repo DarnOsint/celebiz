@@ -200,7 +200,7 @@ export default function QRTableCards() {
         doc.setTextColor(107, 114, 128)
         doc.setFontSize(6.5)
         doc.setFont('helvetica', 'normal')
-        doc.text('Scan to check zone prices', x + colW / 2, y + cardH - 12, { align: 'center' })
+        doc.text('View zone menu', x + colW / 2, y + cardH - 12, { align: 'center' })
         doc.setTextColor(156, 163, 175)
         doc.setFontSize(6)
         doc.text('Celebiz Lounge', x + colW / 2, y + cardH - 5, { align: 'center' })
@@ -321,7 +321,7 @@ export default function QRTableCards() {
                 >
                   <div id={`qr-zone-${zone.id}`} style={{ width: 160, height: 160 }} />
                   <p style={{ color: '#6b7280', fontSize: '9px', textAlign: 'center', margin: 0 }}>
-                    Scan to check zone prices
+                    View zone menu
                   </p>
                   {zone.tables.length > 0 ? (
                     <p

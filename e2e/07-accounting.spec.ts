@@ -10,20 +10,12 @@ test.describe('Accounting', () => {
 
   test('accounting loads with date range and tabs', async ({ page }) => {
     await expect(page.getByText(/Today|This Week|This Month/i)).toBeVisible({ timeout: 8_000 })
-    await expect(page.getByText(/Overview|Orders|Staff|Till/i)).toBeVisible()
+    await expect(page.getByText(/Overview|Orders|Staff/i)).toBeVisible()
   })
 
   test('overview tab shows revenue summary', async ({ page }) => {
     await expect(page.getByText(/Gross Revenue|Total Revenue/i)).toBeVisible({ timeout: 8_000 })
     await expect(page.getByText(/SSP|\$/)).toBeVisible()
-  })
-
-  test('POS Recon tab loads', async ({ page }) => {
-    const posTab = page.getByRole('button', { name: /POS Recon/i })
-    await expect(posTab).toBeVisible({ timeout: 6_000 })
-    await posTab.click()
-    // Should show period label and either machine cards or empty state
-    await expect(page.getByText(/Today|Period|No attendance/i)).toBeVisible({ timeout: 8_000 })
   })
 
   test('staff tab shows waitron performance', async ({ page }) => {

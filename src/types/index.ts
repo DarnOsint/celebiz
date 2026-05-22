@@ -14,7 +14,6 @@ export type Role =
   | 'games_master'
   | 'shisha_attendant'
   | 'supervisor'
-  | 'apartment_manager'
   | 'floor_staff'
   | 'social_media_manager'
   | 'dj'
@@ -33,8 +32,6 @@ export type PaymentMethod =
 export type ItemDestination = 'kitchen' | 'bar' | 'griller' | 'shisha' | 'games' | 'mixologist'
 export type ItemStatus = 'pending' | 'preparing' | 'ready' | 'delivered'
 export type TableStatus = 'available' | 'occupied' | 'reserved'
-export type RoomStatus = 'available' | 'occupied' | 'cleaning' | 'maintenance'
-
 // ─── Database row types ────────────────────────────────────────────────────
 
 export interface Profile {
@@ -157,37 +154,6 @@ export interface InventoryItem {
   selling_price?: number
   menu_item_id?: string | null
   is_active: boolean
-}
-
-export interface Room {
-  id: string
-  name: string
-  room_type: string
-  floor: number
-  capacity?: number
-  rate_per_night: number
-  status: RoomStatus
-  amenities?: string
-  notes?: string
-}
-
-export interface RoomStay {
-  id: string
-  room_id: string
-  guest_name: string
-  guest_phone: string
-  guest_email?: string
-  id_type: string
-  id_number: string
-  num_guests: number
-  check_in_at: string
-  check_out_at: string
-  nights: number
-  payment_method: string
-  payment_reference?: string
-  total_amount: number
-  status: 'active' | 'checked_out' | 'overstay'
-  notes?: string
 }
 
 export interface AuditEntry {

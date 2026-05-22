@@ -2,15 +2,12 @@ import { useState, useEffect } from 'react'
 import {
   ShoppingBag,
   LayoutDashboard,
-  BedDouble,
   Users,
   TrendingUp,
   Clock,
-  DollarSign,
   Settings,
   BookOpen,
   ChevronRight,
-  RefreshCw,
   UtensilsCrossed,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -21,30 +18,26 @@ import { formatPrice } from '../../../lib/currency'
 interface Stats {
   openOrders: number
   occupiedTables: number
-  occupiedRooms: number
   staffOnShift: number
   todayRevenue: number
 }
 
 interface Props {
   stats: Stats
-  pendingCount: number
   onTabChange: (tab: string) => void
 }
 
-export default function OverviewTab({ stats, pendingCount, onTabChange }: Props) {
+export default function OverviewTab({ stats, onTabChange }: Props) {
   const navigate = useNavigate()
   const [totalTables, setTotalTables] = useState(0)
-  const [totalRooms, setTotalRooms] = useState(0)
 
   useEffect(() => {
-    Promise.all([
-      supabase.from('tables').select('id', { count: 'exact', head: true }),
-      supabase.from('rooms').select('id', { count: 'exact', head: true }),
-    ]).then(([t, r]) => {
-      setTotalTables(t.count || 0)
-      setTotalRooms(r.count || 0)
-    })
+    supabase
+      .from('tables')
+      .select('id', { count: 'exact', head: true })
+      .then((t) => {
+        setTotalTables(t.count || 0)
+      })
   }, [])
 
   const kpis = [
@@ -61,13 +54,6 @@ export default function OverviewTab({ stats, pendingCount, onTabChange }: Props)
       icon: LayoutDashboard,
       color: 'text-blue-400',
       bg: 'bg-blue-400/10',
-    },
-    {
-      label: 'Occupied Rooms',
-      value: `${stats.occupiedRooms}/${totalRooms || '—'}`,
-      icon: BedDouble,
-      color: 'text-purple-400',
-      bg: 'bg-purple-400/10',
     },
     {
       label: 'Staff On Shift',
@@ -105,22 +91,10 @@ export default function OverviewTab({ stats, pendingCount, onTabChange }: Props)
       icon: ShoppingBag,
     },
     {
-      label: 'Till Management',
-      sub: 'Cash control and payouts',
-      action: () => onTabChange('till'),
-      icon: DollarSign,
-    },
-    {
       label: 'Kitchen Stock',
       sub: 'Reconcile food input, yield & benchmarks',
       action: () => onTabChange('kitchen'),
       icon: UtensilsCrossed,
-    },
-    {
-      label: 'Room Management',
-      sub: 'Check-in, check-out and room status',
-      action: () => navigate('/rooms'),
-      icon: BedDouble,
     },
     {
       label: 'Accounting',
@@ -139,20 +113,6 @@ export default function OverviewTab({ stats, pendingCount, onTabChange }: Props)
   return (
     <div className="space-y-4">
       <UnassignedCustomerOrders />
-      {pendingCount > 0 && (
-        <button
-          onClick={() => onTabChange('sync')}
-          className="w-full flex items-center justify-between bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-3"
-        >
-          <div className="flex items-center gap-3">
-            <RefreshCw size={15} className="text-amber-400 animate-spin" />
-            <p className="text-amber-400 text-sm font-medium">
-              {pendingCount} offline change{pendingCount > 1 ? 's' : ''} pending sync
-            </p>
-          </div>
-          <span className="text-amber-400/60 text-xs">View →</span>
-        </button>
-      )}
       <div className="grid grid-cols-2 gap-4">
         {kpis.map((k) => (
           <div key={k.label} className="bg-gray-900 rounded-2xl p-4 border border-gray-800">

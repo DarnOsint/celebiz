@@ -9,41 +9,28 @@ import {
   DollarSign,
   Settings,
   AlertTriangle,
-  RefreshCw,
   UtensilsCrossed,
   Shield,
   Beer,
   RotateCcw,
-  Flame,
-  Wind,
-  Gamepad2,
-  Wine,
   Package,
   Trophy,
-  Snowflake,
   ThumbsUp,
 } from 'lucide-react'
 import ShiftManager from './ShiftManager'
 import TableAssignment from './TableAssignment'
-import TillManagement from './TillManagement'
 import WaiterCalls from './WaiterCalls'
 import KitchenStock from '../backoffice/KitchenStock'
 import ReturnedDrinksTab from './mgmt/ReturnedDrinksTab'
 import ChillerTab from './mgmt/ChillerTab'
 import StaffPerformanceTab from './mgmt/StaffPerformanceTab'
 import PayrollTab from './mgmt/PayrollTab'
-import KitchenFridgeTab from './mgmt/KitchenFridgeTab'
 import StationSalesTab from './mgmt/StationSalesTab'
 import { useLateOrders } from '../../hooks/useLateOrders'
-import { useSyncStatus } from '../../hooks/useSyncStatus'
-import { useVisibilityInterval } from '../../hooks/useVisibilityInterval'
-import type { SyncQueueEntry } from '../../lib/db'
-import { getPendingQueue } from '../../lib/db'
 import { HelpTooltip } from '../../components/HelpTooltip'
 
 import OverviewTab from './mgmt/OverviewTab'
 import OpenOrdersTab from './mgmt/OpenOrdersTab'
-import SyncTab from './mgmt/SyncTab'
 import SettingsTab from './mgmt/SettingsTab'
 import ActivityLogTab from './mgmt/ActivityLogTab'
 import MainStoreSummaryTab from './mgmt/MainStoreSummaryTab'
@@ -82,21 +69,14 @@ const TABS = [
   { id: 'orders', label: 'Orders', icon: ShoppingBag },
   { id: 'performance', label: 'Staff Performance', icon: Trophy },
   { id: 'payroll', label: 'Payroll', icon: DollarSign },
-  { id: 'till', label: 'Till', icon: DollarSign },
   { id: 'barsales', label: 'Bar Sales', icon: Beer },
   { id: 'kitchen', label: 'Kitchen Sales', icon: UtensilsCrossed },
-  { id: 'grillersales', label: 'Grill Sales', icon: Flame },
-  { id: 'mixosales', label: 'Mixologist Sales', icon: Wine },
-  { id: 'shishasales', label: 'Shisha Sales', icon: Wind },
-  { id: 'gamessales', label: 'Games Sales', icon: Gamepad2 },
   { id: 'chiller', label: 'Chiller', icon: Beer },
   { id: 'mainstore', label: 'Main Store', icon: Package },
-  { id: 'fridge', label: 'Kitchen Fridge', icon: Snowflake },
   { id: 'returns', label: 'Returns', icon: RotateCcw },
   { id: 'voids', label: 'Voids', icon: AlertTriangle },
   { id: 'ratings', label: 'Ratings', icon: ThumbsUp },
   { id: 'settings', label: 'Alert Threshold', icon: Settings },
-  { id: 'sync', label: 'Sync', icon: RefreshCw },
   { id: 'activity', label: 'Activity Log', icon: Shield },
 ] as const
 
@@ -105,12 +85,11 @@ type TabId = (typeof TABS)[number]['id']
 interface Stats {
   openOrders: number
   occupiedTables: number
-  occupiedRooms: number
   staffOnShift: number
   todayRevenue: number
 }
 export default function Management() {
-  useAuth() // profile/signOut available via context when needed
+  useAuth()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
   const { lateOrders, threshold, setThreshold, markDelivered } = useLateOrders()
 
@@ -119,13 +98,9 @@ export default function Management() {
     const { start, end } = activityWindow(activityDate)
     return { start: start.toISOString(), end: end.toISOString() }
   }, [activityDate])
-  const { status: syncStatus, pendingCount, lastSynced, manualSync } = useSyncStatus()
-
-  const [syncQueue, setSyncQueue] = useState<SyncQueueEntry[]>([])
   const [stats, setStats] = useState<Stats>({
     openOrders: 0,
     occupiedTables: 0,
-    occupiedRooms: 0,
     staffOnShift: 0,
     todayRevenue: 0,
   })
@@ -138,10 +113,9 @@ export default function Management() {
   const fetchStats = useCallback(async () => {
     void supabase.rpc('free_orphaned_tables')
     const { start, end } = sessionWindow()
-    const [ordersRes, tablesRes, roomsRes, staffRes, revenueRes] = await Promise.all([
+    const [ordersRes, tablesRes, staffRes, revenueRes] = await Promise.all([
       supabase.from('orders').select('id').eq('status', 'open'),
       supabase.from('tables').select('id').eq('status', 'occupied'),
-      supabase.from('rooms').select('status'),
       supabase.from('attendance').select('staff_id').or('clock_out.is.null'),
       supabase
         .from('orders')
@@ -153,7 +127,6 @@ export default function Management() {
     setStats({
       openOrders: ordersRes.data?.length || 0,
       occupiedTables: tablesRes.data?.length || 0,
-      occupiedRooms: roomsRes.data?.filter((r) => r.status === 'occupied').length || 0,
       staffOnShift: new Set((staffRes.data || []).map((r: { staff_id: string }) => r.staff_id))
         .size,
       todayRevenue: (revenueRes.data || []).reduce((s: number, o: any) => {
@@ -206,12 +179,6 @@ export default function Management() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () =>
         scheduleFetchStats(10000)
       )
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () =>
-        scheduleFetchStats(10000)
-      )
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'room_stays' }, () =>
-        scheduleFetchStats(10000)
-      )
       .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, () =>
         scheduleFetchStats(10000)
       )
@@ -223,31 +190,18 @@ export default function Management() {
     }
   }, [scheduleFetchStats])
 
-  useEffect(() => {
-    const load = async () => {
-      const q = await getPendingQueue()
-      setSyncQueue(q || [])
-    }
-    load()
-    // Poll queue only while tab is active (reduces background egress).
-  }, [])
-  useVisibilityInterval(async () => {
-    const q = await getPendingQueue()
-    setSyncQueue(q || [])
-  }, 30_000)
-
   const helpTips = [
     {
       id: 'mgmt-overview',
       title: 'Overview',
       description:
-        "Live dashboard: open orders, occupied tables and rooms, staff on shift, and today's revenue — all updating in real time. The late orders banner turns red when any order exceeds the configured alert threshold (set under Settings). Figures are deduplicated so one waitron always counts as one.",
+        "Live dashboard: open orders, occupied tables, staff on shift, and today's revenue — all updating in real time. The late orders banner turns red when any order exceeds the configured alert threshold (set under Settings). Figures are deduplicated so one waitron always counts as one.",
     },
     {
       id: 'mgmt-shifts',
       title: 'Shifts Tab',
       description:
-        'Clock staff in and out. When clocking in a waitron, assign them a POS machine from the dropdown if you have named terminals — this links every sale to a specific device for reconciliation. The system checks the database live before every clock-in to prevent duplicate entries. Clocking out a waitron with open orders triggers a warning — resolve those orders first.',
+        'Clock staff in and out. The system checks the database live before every clock-in to prevent duplicate entries. Clocking out a waitron with open orders triggers a warning — resolve those orders first.',
     },
     {
       id: 'mgmt-tables',
@@ -260,12 +214,6 @@ export default function Management() {
       title: 'Orders Tab',
       description:
         'Live view of all open orders — table, waitron, items, and total. Use Force Close on any order that is stuck as open after payment has already been collected. Force Close marks all items as delivered so the KDS clears, frees the table, and closes the order cleanly.',
-    },
-    {
-      id: 'mgmt-till',
-      title: 'Till Tab',
-      description:
-        'Open and close till sessions with opening float. Log cash payouts (expenses, petty cash, advances) during the session. At close, the system calculates expected cash vs actual and flags any shortfall or surplus.',
     },
     {
       id: 'mgmt-kitchen',
@@ -284,12 +232,6 @@ export default function Management() {
       title: 'Alert Threshold',
       description:
         'Configure the late order alert threshold — how many minutes before an unfulfilled order triggers a warning banner for management and the Supervisor.',
-    },
-    {
-      id: 'mgmt-sync',
-      title: 'Sync Tab',
-      description:
-        'Shows the offline sync queue — any writes that could not reach Supabase while offline are queued here and retried automatically when connectivity is restored. Tap Manual Sync to force an immediate retry.',
     },
   ]
 
@@ -377,41 +319,20 @@ export default function Management() {
       {/* Tab content */}
       <div className="p-4">
         {activeTab === 'overview' && (
-          <OverviewTab
-            stats={stats}
-            pendingCount={pendingCount}
-            onTabChange={(id) => setActiveTab(id as TabId)}
-          />
+          <OverviewTab stats={stats} onTabChange={(id) => setActiveTab(id as TabId)} />
         )}
         {activeTab === 'shifts' && <ShiftManager onRefreshStats={fetchStats} />}
         {activeTab === 'tables' && <TableAssignment />}
         {activeTab === 'orders' && <OpenOrdersTab />}
-        {activeTab === 'till' && <TillManagement />}
         {activeTab === 'barsales' && <StationSalesTab destination="bar" label="Bar" />}
         {activeTab === 'kitchen' && <StationSalesTab destination="kitchen" label="Kitchen" />}
-        {activeTab === 'grillersales' && <StationSalesTab destination="griller" label="Griller" />}
-        {activeTab === 'mixosales' && (
-          <StationSalesTab destination="mixologist" label="Mixologist" />
-        )}
-        {activeTab === 'shishasales' && <StationSalesTab destination="shisha" label="Shisha" />}
-        {activeTab === 'gamessales' && <StationSalesTab destination="games" label="Games" />}
         {activeTab === 'performance' && <StaffPerformanceTab />}
         {activeTab === 'payroll' && <PayrollTab />}
         {activeTab === 'chiller' && <ChillerTab />}
         {activeTab === 'mainstore' && <MainStoreSummaryTab />}
-        {activeTab === 'fridge' && <KitchenFridgeTab />}
         {activeTab === 'returns' && <ReturnedDrinksTab />}
         {activeTab === 'voids' && <VoidsTab />}
         {activeTab === 'ratings' && <ServiceRatingsTab />}
-        {activeTab === 'sync' && (
-          <SyncTab
-            syncStatus={syncStatus}
-            pendingCount={pendingCount}
-            lastSynced={lastSynced}
-            syncQueue={syncQueue}
-            onManualSync={manualSync}
-          />
-        )}
         {activeTab === 'activity' && (
           <div>
             <div className="flex items-center gap-3 mb-4">

@@ -8,11 +8,10 @@ test.describe('Executive Dashboard', () => {
     await page.goto('/executive')
   })
 
-  test('executive dashboard shows all 6 KPI cards', async ({ page }) => {
+  test('executive dashboard shows all 5 KPI cards', async ({ page }) => {
     await expect(page.getByText(/Today.*Revenue|Revenue Today/i)).toBeVisible({ timeout: 8_000 })
     await expect(page.getByText(/Open Orders/i)).toBeVisible()
     await expect(page.getByText(/Occupied Tables/i)).toBeVisible()
-    await expect(page.getByText(/Occupied Rooms/i)).toBeVisible()
     await expect(page.getByText(/Staff On Duty/i)).toBeVisible()
     await expect(page.getByText(/Low Stock/i)).toBeVisible()
   })

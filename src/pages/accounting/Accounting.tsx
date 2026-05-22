@@ -12,9 +12,6 @@ import {
   BookOpen,
   Shield,
   TrendingUp,
-  Monitor,
-  Heart,
-  RotateCcw,
   Beer,
   ChefHat,
   ClipboardList,
@@ -30,14 +27,9 @@ import Debtors from './Debtors'
 import OverviewTab from './OverviewTab'
 import OrdersTab from './OrdersTab'
 import StaffTab from './StaffTab'
-import TillTab from './TillTab'
-import PayoutsTab from './PayoutsTab'
 import TrendsTab from './TrendsTab'
 import LedgerTab from './LedgerTab'
 import AuditTab from './AuditTab'
-import POSReconciliationTab from './POSReconciliationTab'
-import TipsTab from './TipsTab'
-import ReturnsTab from './ReturnsTab'
 import MainStoreTab from './MainStoreTab'
 import StoreToChillerTab from './StoreToChillerTab'
 import { getNetOrderAmount } from './orderAmounts'
@@ -47,7 +39,6 @@ import type {
   WaitronStat,
   TrendPoint,
   PayoutRow,
-  TillSession,
   TimesheetEntry,
   AuditEntry,
 } from './types'
@@ -62,15 +53,10 @@ const TABS = [
   { id: 'staff', label: 'Staff Sales', icon: Users },
   { id: 'attendance', label: 'Attendance', icon: CalendarDays },
   { id: 'timesheet', label: 'Timesheet', icon: Clock },
-  { id: 'till', label: 'Till', icon: Clock },
-  { id: 'payouts', label: 'Payouts', icon: DollarSign },
-  { id: 'tips', label: 'Tips', icon: Heart },
-  { id: 'returns', label: 'Returns', icon: RotateCcw },
   { id: 'trends', label: 'Trends', icon: TrendingUp },
   { id: 'debtors', label: 'Outstanding', icon: AlertTriangle },
   { id: 'ledger', label: 'Ledger', icon: BookOpen },
   { id: 'audit', label: 'Audit', icon: Shield },
-  { id: 'pos', label: 'POS Recon', icon: Monitor },
   { id: 'waitron_orders', label: 'Waitron Orders', icon: ClipboardList },
   { id: 'bar_stock', label: 'Bar Stock', icon: Beer },
   { id: 'kitchen_stock', label: 'Kitchen Stock', icon: ChefHat },
@@ -134,7 +120,6 @@ export default function Accounting() {
     Array<{ name: string; amount: number; notes: string; date: string; by: string }>
   >([])
   const [trendData, setTrendData] = useState<TrendPoint[]>([])
-  const [tillSessions, setTillSessions] = useState<TillSession[]>([])
   const [timesheet, setTimesheet] = useState<TimesheetEntry[]>([])
   const [auditLog, setAuditLog] = useState<AuditEntry[]>([])
   const [payouts, setPayouts] = useState<PayoutRow[]>([])
@@ -194,7 +179,7 @@ export default function Accounting() {
     setLoading(true)
     const { start, end } = getDateBounds()
 
-    const [ordersRes, tillRes, payoutsRes, trendRes, timesheetRes, auditRes] = await Promise.all([
+    const [ordersRes, payoutsRes, trendRes, timesheetRes, auditRes] = await Promise.all([
       // IMPORTANT:
       // - Paid sales must be filtered by `closed_at` so end-of-day reports tally with actual sales time.
       // - Open orders (not yet paid) can be filtered by `created_at` for visibility during the session.
@@ -207,14 +192,6 @@ export default function Accounting() {
           `and(status.eq.paid,closed_at.gte.${start},closed_at.lt.${end}),and(status.neq.paid,created_at.gte.${start},created_at.lt.${end})`
         )
         .order('created_at', { ascending: false }),
-      supabase
-        .from('till_sessions')
-        .select(
-          'id, opening_float, closing_float, expected_cash, status, opened_at, profiles(full_name)'
-        )
-        .gte('opened_at', start)
-        .lte('opened_at', end)
-        .order('opened_at', { ascending: false }),
       supabase
         .from('payouts')
         .select('id, amount, reason, category, paid_to, created_at')
@@ -231,9 +208,7 @@ export default function Accounting() {
         .order('created_at', { ascending: true }),
       supabase
         .from('attendance')
-        .select(
-          'id, staff_id, staff_name, role, date, clock_in, clock_out, duration_minutes, pos_machine'
-        )
+        .select('id, staff_id, staff_name, role, date, clock_in, clock_out, duration_minutes')
         .gte('clock_in', start)
         .lte('clock_in', end)
         .order('clock_in', { ascending: false }),
@@ -371,7 +346,6 @@ export default function Accounting() {
     })
     setTrendData(Object.values(dayMap))
 
-    setTillSessions((tillRes.data || []) as unknown as TillSession[])
     setTimesheet((timesheetRes.data || []) as TimesheetEntry[])
     setAuditLog((auditRes.data || []) as AuditEntry[])
     setPayouts((payoutsRes.data || []) as PayoutRow[])
@@ -391,7 +365,12 @@ export default function Accounting() {
     fetchAll()
   }, [fetchAll])
 
-  // ── Void log fetch (date-specific) ───────────────────────────────────────
+  const dateLabel =
+    dateRange === 'Date' && pickedDate
+      ? pickedDate
+      : dateRange === 'Custom'
+        ? `${customStart}–${customEnd}`
+        : dateRange
 
   const totalPayouts = payouts.reduce((s, p) => s + (p.amount || 0), 0)
   const netRevenue = summary.total - totalPayouts
@@ -479,7 +458,7 @@ export default function Accounting() {
                 id: 'acc-staff',
                 title: 'Staff Tab',
                 description:
-                  "Per-waitron breakdown — total revenue, orders closed, average order value, and POS machine assigned. Use this at shift close to verify each waitron's sales against their POS terminal's expected total.",
+                  'Per-waitron breakdown — total revenue, orders closed, and average order value.',
               },
               {
                 id: 'acc-till',
@@ -515,7 +494,7 @@ export default function Accounting() {
                 id: 'acc-ledger',
                 title: 'Ledger Tab',
                 description:
-                  'Double-entry general ledger — every sale, payout, debtor payment, and room charge recorded as credit or debit with a running balance. Search by description, reference, or type. Exportable to PDF.',
+                  'Double-entry general ledger — every sale, payout, and debtor payment recorded as credit or debit with a running balance. Search by description, reference, or type. Exportable to PDF.',
               },
               {
                 id: 'acc-audit',
@@ -551,19 +530,12 @@ export default function Accounting() {
             totalPayouts={totalPayouts}
             netRevenue={netRevenue}
             waitronStats={waitronStats}
-            dateLabel={
-              dateRange === 'Custom'
-                ? `${customStart} – ${customEnd}`
-                : dateRange === 'Date'
-                  ? pickedDate
-                  : dateRange
-            }
+            dateLabel={dateLabel}
             sessionDate={sessionDate}
             sessionEndDate={sessionEndDateInclusive}
             dateRangeType={dateRange}
             creditByWaitron={creditByWaitron}
             creditDetails={creditDetailsList}
-            onRecordPayout={() => setActiveTab('payouts')}
           />
         )}
         {activeTab === 'orders' && (
@@ -572,10 +544,6 @@ export default function Accounting() {
         {activeTab === 'staff' && <StaffTab waitronStats={waitronStats} />}
         {activeTab === 'attendance' && <AttendanceTab />}
         {activeTab === 'timesheet' && <TimesheetTab />}
-        {activeTab === 'till' && <TillTab tillSessions={tillSessions} />}
-        {activeTab === 'payouts' && (
-          <PayoutsTab payouts={payouts} totalPayouts={totalPayouts} onRefresh={fetchAll} />
-        )}
         {activeTab === 'trends' && <TrendsTab trendData={trendData} />}
         {activeTab === 'debtors' && (
           <Debtors onBack={() => setActiveTab('overview')} embedded={true} />
@@ -583,37 +551,6 @@ export default function Accounting() {
 
         {activeTab === 'ledger' && <LedgerTab dateRange={dateRange} />}
         {activeTab === 'audit' && <AuditTab auditLog={auditLog} dateRange={dateRange} />}
-        {activeTab === 'pos' && (
-          <POSReconciliationTab
-            timesheet={timesheet}
-            orders={orders}
-            dateLabel={dateRange === 'Custom' ? `${customStart} – ${customEnd}` : dateRange}
-          />
-        )}
-        {activeTab === 'tips' &&
-          (() => {
-            const { start, end } = getDateBounds()
-            return (
-              <TipsTab
-                dateRange={{
-                  from: start.slice(0, 10),
-                  to: end.slice(0, 10),
-                }}
-              />
-            )
-          })()}
-        {activeTab === 'returns' &&
-          (() => {
-            const { start, end } = getDateBounds()
-            return (
-              <ReturnsTab
-                dateRange={{
-                  start: start.slice(0, 10),
-                  end: end.slice(0, 10),
-                }}
-              />
-            )
-          })()}
         {activeTab === 'waitron_orders' && <WaitronOrdersTab />}
         {activeTab === 'bar_stock' && <StockSummaryTab type="bar" />}
         {activeTab === 'kitchen_stock' && <StockSummaryTab type="kitchen" />}

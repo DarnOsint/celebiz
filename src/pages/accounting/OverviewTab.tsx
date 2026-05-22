@@ -6,7 +6,6 @@ import {
   CreditCard,
   Smartphone,
   Receipt,
-  Plus,
   Save,
   Users,
   AlertTriangle,
@@ -48,7 +47,6 @@ interface Props {
     by: string
     items?: string
   }>
-  onRecordPayout: () => void
 }
 
 interface Reconciliation {
@@ -70,7 +68,6 @@ export default function OverviewTab({
   dateRangeType,
   creditByWaitron = {},
   creditDetails = [],
-  onRecordPayout,
 }: Props) {
   const { profile } = useAuth()
   const toast = useToast()
@@ -867,15 +864,7 @@ export default function OverviewTab({
 
       {/* Payouts summary */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-white font-semibold">Expenses & Payouts</h3>
-          <button
-            onClick={onRecordPayout}
-            className="flex items-center gap-1.5 text-xs bg-amber-500 hover:bg-amber-400 text-black font-bold px-3 py-1.5 rounded-lg transition-colors"
-          >
-            <Plus size={13} /> Record
-          </button>
-        </div>
+        <h3 className="text-white font-semibold mb-4">Expenses & Payouts</h3>
         <div className="flex items-center justify-between">
           <span className="text-gray-400">Total expenses this period</span>
           <span className="text-red-400 font-bold text-xl">{formatPrice(totalPayouts)}</span>

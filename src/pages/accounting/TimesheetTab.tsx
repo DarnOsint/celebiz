@@ -13,7 +13,6 @@ interface TimesheetEntry {
   clock_in: string
   clock_out?: string | null
   duration_minutes?: number | null
-  pos_machine?: string
 }
 
 function fmtTime(d: string) {
@@ -34,9 +33,7 @@ export default function TimesheetTab() {
     setLoading(true)
     const { data } = await supabase
       .from('attendance')
-      .select(
-        'id, staff_id, staff_name, role, date, clock_in, clock_out, duration_minutes, pos_machine'
-      )
+      .select('id, staff_id, staff_name, role, date, clock_in, clock_out, duration_minutes')
       .eq('date', d)
       .order('clock_in', { ascending: true })
     setEntries((data || []) as TimesheetEntry[])
@@ -112,7 +109,6 @@ export default function TimesheetTab() {
                 <th className="text-left px-2 py-2">Clock In</th>
                 <th className="text-left px-2 py-2">Clock Out</th>
                 <th className="text-right px-2 py-2">Hours</th>
-                <th className="text-left px-3 py-2">POS</th>
               </tr>
             </thead>
             <tbody>
@@ -143,9 +139,6 @@ export default function TimesheetTab() {
                       )}
                     </td>
                     <td className="px-2 py-2.5 text-right text-amber-400 font-medium">{hours}h</td>
-                    <td className="px-3 py-2.5 text-gray-500 text-[10px]">
-                      {e.pos_machine || '—'}
-                    </td>
                   </tr>
                 )
               })}
@@ -156,7 +149,6 @@ export default function TimesheetTab() {
                   TOTAL
                 </td>
                 <td className="px-2 py-2 text-right text-amber-400">{totalHours}h</td>
-                <td className="px-3 py-2"></td>
               </tr>
             </tfoot>
           </table>

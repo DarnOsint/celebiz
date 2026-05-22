@@ -9,16 +9,11 @@ test.describe('Back Office', () => {
   })
 
   test('backoffice shows all section tiles', async ({ page }) => {
-    const sections = ['Staff Management', 'Menu Management', 'Zone Pricing',
-      'Table Configuration', 'POS Machines', 'Drink Inventory', 'Suppliers']
+    const sections = ['Staff Management', 'Menu Management',
+      'Table Configuration', 'Drink Inventory']
     for (const s of sections) {
       await expect(page.getByText(s)).toBeVisible({ timeout: 8_000 })
     }
-  })
-
-  test('POS Machines section loads and shows add form', async ({ page }) => {
-    await page.getByText('POS Machines').click()
-    await expect(page.getByPlaceholder(/POS-1|Counter|Terminal/i)).toBeVisible({ timeout: 6_000 })
   })
 
   test('Table Config shows zone settings with hire fee fields', async ({ page }) => {
@@ -29,11 +24,6 @@ test.describe('Back Office', () => {
   test('menu management loads item list', async ({ page }) => {
     await page.getByText('Menu Management').click()
     await expect(page.getByPlaceholder(/search/i)).toBeVisible({ timeout: 6_000 })
-  })
-
-  test('zone pricing shows zone tabs', async ({ page }) => {
-    await page.getByText('Zone Pricing').click()
-    await expect(page.getByText(/Outdoor|Indoor|VIP|Nook/i)).toBeVisible({ timeout: 6_000 })
   })
 
   test('staff management loads staff list', async ({ page }) => {

@@ -24,24 +24,18 @@ const Executive = lazy(() => import('./pages/executive/Executive'))
 // Accounting suite
 const Accounting = lazy(() => import('./pages/accounting/Accounting'))
 const Debtors = lazy(() => import('./pages/accounting/Debtors'))
-// Reports & analytics — heaviest chunk (recharts)
 const Reports = lazy(() => import('./pages/reports/Reports'))
-const Analytics = lazy(() => import('./pages/analytics/Analytics'))
 // Back office
 const BackOffice = lazy(() => import('./pages/backoffice/BackOffice'))
 const QRTableCards = lazy(() => import('./pages/backoffice/QRTableCards'))
-// Rooms
-const RoomManagement = lazy(() => import('./pages/rooms/RoomManagement'))
 // Misc
 const SupervisorDashboard = lazy(() => import('./pages/supervisor/SupervisorDashboard'))
-const ApartmentDashboard = lazy(() => import('./pages/apartment/ApartmentDashboard'))
 const MonthEnd = lazy(() => import('./pages/monthend/MonthEnd'))
 const GamesMasterPage = lazy(() => import('./pages/games/GamesMasterPage'))
 const ShishaAttendantPage = lazy(() => import('./pages/shisha/ShishaAttendantPage'))
 // Public customer pages
 const TableView = lazy(() => import('./pages/customer/TableView'))
 const ReceiptView = lazy(() => import('./pages/customer/ReceiptView'))
-const ZoneMenuView = lazy(() => import('./pages/customer/ZoneMenuView'))
 import type { Role } from './types'
 
 function ScrollToTop() {
@@ -134,7 +128,6 @@ function RoleRoute() {
   if (profile.role === 'bar') return <Navigate to="/kds/bar" />
   if (profile.role === 'griller') return <Navigate to="/kds/griller" />
   if (profile.role === 'mixologist') return <Navigate to="/kds/mixologist" />
-  if (profile.role === 'apartment_manager') return <Navigate to="/apartment" />
   if (profile.role === 'auditor') return <Navigate to="/accounting" />
   if (profile.role === 'games_master') return <Navigate to="/games" />
   if (profile.role === 'shisha_attendant') return <Navigate to="/shisha" />
@@ -292,18 +285,6 @@ function AppRoutes() {
             }
           />
           <Route
-            path="/rooms"
-            element={
-              <PrivateRoute>
-                <RoleGuard allowed={['owner', 'manager']}>
-                  <EB title="Room management error">
-                    <RoomManagement />
-                  </EB>
-                </RoleGuard>
-              </PrivateRoute>
-            }
-          />
-          <Route
             path="/debtors"
             element={
               <PrivateRoute>
@@ -328,18 +309,6 @@ function AppRoutes() {
             }
           />
           <Route
-            path="/analytics"
-            element={
-              <PrivateRoute>
-                <RoleGuard allowed={['owner', 'manager', 'accountant', 'auditor']}>
-                  <EB title="Analytics error">
-                    <Analytics />
-                  </EB>
-                </RoleGuard>
-              </PrivateRoute>
-            }
-          />
-          <Route
             path="/supervisor"
             element={
               <PrivateRoute>
@@ -349,19 +318,6 @@ function AppRoutes() {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/apartment"
-            element={
-              <PrivateRoute>
-                <RoleGuard allowed={['owner', 'apartment_manager']}>
-                  <EB title="Apartment dashboard error">
-                    <ApartmentDashboard />
-                  </EB>
-                </RoleGuard>
-              </PrivateRoute>
-            }
-          />
-
           <Route
             path="/month-end"
             element={
@@ -406,22 +362,6 @@ function AppRoutes() {
             element={
               <EB title="Order page error">
                 <TableView />
-              </EB>
-            }
-          />
-          <Route
-            path="/zone/:zoneId"
-            element={
-              <EB title="Menu page error">
-                <ZoneMenuView />
-              </EB>
-            }
-          />
-          <Route
-            path="/zone-menu/:zoneId"
-            element={
-              <EB title="Menu page error">
-                <ZoneMenuView />
               </EB>
             }
           />

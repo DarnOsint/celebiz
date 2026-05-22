@@ -13,7 +13,6 @@ const STORES = [
   'payouts',
   'menu_items',
   'menu_categories',
-  'menu_item_zone_prices',
   'tables',
   'profiles',
   'zone_assignments',

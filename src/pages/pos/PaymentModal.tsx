@@ -4,8 +4,6 @@ import { audit } from '../../lib/audit'
 import { formatPrice } from '../../lib/currency'
 import { useAuth } from '../../context/AuthContext'
 import { sendPushToStaff } from '../../hooks/usePushNotifications'
-import { isNetworkPrinterAvailable, printViaNetwork } from '../../lib/networkPrinter'
-import { buildReceipt } from '../../hooks/useThermalPrinter'
 import { offlineUpdateNoReturn } from '../../lib/offlineWrite'
 import {
   X,
@@ -20,7 +18,6 @@ import {
 import ReceiptModal from './ReceiptModal'
 import type { Table, Profile, ItemDestination } from '../../types'
 import { useToast } from '../../context/ToastContext'
-import { buildOrderTicketHTML, type TicketItem } from '../../lib/orderTicket'
 
 interface OrderItemExtended {
   id: string
@@ -127,43 +124,6 @@ const normalizeDestination = (
 const getStationItemTime = (item: OrderItemExtended, fallbackCreatedAt: string): string =>
   item.created_at || fallbackCreatedAt
 
-const getLatestPendingBatch = (
-  items: OrderItemExtended[],
-  station: 'kitchen' | 'griller',
-  orderCreatedAt: string,
-  lastPrintedAt: string | null
-): OrderItemExtended[] => {
-  const stationPending = items
-    .filter((item) => {
-      const isStation =
-        normalizeDestination(
-          item.destination || item.menu_items?.menu_categories?.destination || 'bar',
-          item.menu_items?.name,
-          item.menu_items?.menu_categories?.name
-        ) === station
-      return isStation && item.status === 'pending'
-    })
-    .sort(
-      (a, b) =>
-        new Date(getStationItemTime(a, orderCreatedAt)).getTime() -
-        new Date(getStationItemTime(b, orderCreatedAt)).getTime()
-    )
-
-  if (!stationPending.length) return []
-
-  if (lastPrintedAt) {
-    const unprinted = stationPending.filter(
-      (item) =>
-        new Date(getStationItemTime(item, orderCreatedAt)).getTime() >
-        new Date(lastPrintedAt).getTime()
-    )
-    if (unprinted.length) return unprinted
-  }
-
-  const latestTime = getStationItemTime(stationPending[stationPending.length - 1], orderCreatedAt)
-  return stationPending.filter((item) => getStationItemTime(item, orderCreatedAt) === latestTime)
-}
-
 export default function PaymentModal({ order: orderProp, table, onSuccess, onClose }: Props) {
   const [order, setOrder] = useState(orderProp)
   // Sync when parent refreshes the order (realtime DB update)
@@ -181,25 +141,6 @@ export default function PaymentModal({ order: orderProp, table, onSuccess, onClo
       .single()
     if (data) {
       setOrder(data as unknown as OrderExtended)
-      const items = (data as any).order_items || []
-      const isKitchen = (i: any) =>
-        normalizeDestination(
-          i.destination || i.menu_items?.menu_categories?.destination || 'bar',
-          i.menu_items?.name,
-          i.menu_items?.menu_categories?.name
-        ) === 'kitchen'
-      const isGrill = (i: any) =>
-        normalizeDestination(
-          i.destination || i.menu_items?.menu_categories?.destination || 'bar',
-          i.menu_items?.name,
-          i.menu_items?.menu_categories?.name
-        ) === 'griller'
-      setKitchenPendingCount(
-        items.filter((i: any) => isKitchen(i) && i.status === 'pending').length
-      )
-      setGrillPendingCount(items.filter((i: any) => isGrill(i) && i.status === 'pending').length)
-      setKitchenTotalCount(items.filter(isKitchen).length)
-      setGrillTotalCount(items.filter(isGrill).length)
     }
   }
 
@@ -262,39 +203,6 @@ export default function PaymentModal({ order: orderProp, table, onSuccess, onClo
   const [amountReceived, setAmountReceived] = useState('')
   const [cashSplit, setCashSplit] = useState('')
   const [secondarySplit, setSecondarySplit] = useState('')
-  const [kitchenPendingCount, setKitchenPendingCount] = useState(0)
-  const [grillPendingCount, setGrillPendingCount] = useState(0)
-  const [kitchenTotalCount, setKitchenTotalCount] = useState(0)
-  const [grillTotalCount, setGrillTotalCount] = useState(0)
-  const [lastPrintedKitchenAt, setLastPrintedKitchenAt] = useState<string | null>(null)
-  const [lastPrintedGrillAt, setLastPrintedGrillAt] = useState<string | null>(null)
-
-  // keep station counts in sync on initial load and when items change
-  useEffect(() => {
-    const items = (order?.order_items as any[]) || []
-    const isKitchen = (i: any) =>
-      normalizeDestination(
-        i.destination || i.menu_items?.menu_categories?.destination || 'bar',
-        i.menu_items?.name,
-        i.menu_items?.menu_categories?.name
-      ) === 'kitchen'
-    const isGrill = (i: any) =>
-      normalizeDestination(
-        i.destination || i.menu_items?.menu_categories?.destination || 'bar',
-        i.menu_items?.name,
-        i.menu_items?.menu_categories?.name
-      ) === 'griller'
-    setKitchenTotalCount(items.filter(isKitchen).length)
-    setGrillTotalCount(items.filter(isGrill).length)
-    const orderCreatedAt = order?.created_at || new Date().toISOString()
-    setKitchenPendingCount(
-      getLatestPendingBatch(items, 'kitchen', orderCreatedAt, lastPrintedKitchenAt).length
-    )
-    setGrillPendingCount(
-      getLatestPendingBatch(items, 'griller', orderCreatedAt, lastPrintedGrillAt).length
-    )
-  }, [order?.order_items, lastPrintedKitchenAt, lastPrintedGrillAt])
-
   useState(() => {
     supabase
       .from('bank_accounts')
@@ -739,152 +647,6 @@ export default function PaymentModal({ order: orderProp, table, onSuccess, onClo
         }
       }, 300000)
     }
-
-    // Additionally try network printer in background
-    try {
-      const networkAvailable = await isNetworkPrinterAvailable()
-      if (networkAvailable) {
-        const bytes = buildReceipt({
-          order: { ...order, payment_method: 'PRE-PAYMENT' },
-          items: (order.order_items || []).map((i) => ({
-            quantity: i.quantity,
-            total_price: (i as unknown as { total_price?: number }).total_price || 0,
-            menu_items: i.menu_items,
-            name: i.menu_items?.name || 'Item',
-          })) as Parameters<typeof buildReceipt>[0]['items'],
-          table,
-          staffName: profile?.full_name || 'Staff',
-          orderRef: `BSP-${String(order.id).slice(0, 8).toUpperCase()}`,
-          subtotal: orderTotal,
-          vatAmount: 0,
-          total: orderTotal,
-        })
-        await printViaNetwork(bytes)
-      }
-    } catch {
-      // Network print failed — browser print already handled it
-    }
-  }
-
-  const printAllForStation = (station: 'kitchen' | 'griller') => {
-    const stationItems = (order?.order_items || []).filter(
-      (i) =>
-        normalizeDestination(
-          i.destination || (i as any)?.menu_items?.menu_categories?.destination || 'bar',
-          (i as any)?.menu_items?.name,
-          (i as any)?.menu_items?.menu_categories?.name
-        ) === station
-    )
-    if (stationItems.length === 0) {
-      toast.info('No items', `No ${station} items to print.`)
-      return
-    }
-    const stationLabel = station === 'kitchen' ? 'Kitchen — All Items' : 'Grill — All Items'
-    const ticket: TicketItem[] = stationItems.map((i) => ({
-      quantity: i.quantity,
-      name:
-        i.menu_items?.name ||
-        (i as unknown as { modifier_notes?: string }).modifier_notes ||
-        'Item',
-      modifier_notes: (i as unknown as { modifier_notes?: string }).modifier_notes || null,
-      unit_price: (i as unknown as { unit_price?: number | null }).unit_price ?? null,
-      total_price:
-        ((i as unknown as { total_price?: number | null }).total_price || 0) +
-        ((i as unknown as { extra_charge?: number | null }).extra_charge || 0),
-    }))
-    const html = buildOrderTicketHTML({
-      station: stationLabel,
-      tableName: table?.name || 'Counter',
-      orderRef: (order?.id || '').slice(0, 8).toUpperCase(),
-      staffName: profile?.full_name || '',
-      items: ticket,
-      createdAt: new Date().toISOString(),
-    })
-    const copies = 2
-    for (let c = 0; c < copies; c++) {
-      const w = window.open('', '_blank', 'width=420,height=640,toolbar=no,menubar=no')
-      if (!w) continue
-      w.document.open('text/html', 'replace')
-      w.document.write(html)
-      w.document.close()
-      w.onload = () =>
-        setTimeout(() => {
-          try {
-            w.print()
-          } catch {
-            /* ignore */
-          } finally {
-            w.close()
-          }
-        }, 150)
-    }
-    // After printing full docket, advance the station's last-printed marker
-    if (station === 'kitchen') setLastPrintedKitchenAt(new Date().toISOString())
-    else setLastPrintedGrillAt(new Date().toISOString())
-  }
-
-  const printPendingForStation = (station: 'kitchen' | 'griller') => {
-    const lastPrinted =
-      station === 'kitchen'
-        ? lastPrintedKitchenAt
-        : station === 'griller'
-          ? lastPrintedGrillAt
-          : null
-    const orderCreatedAt = order?.created_at || new Date().toISOString()
-    const pending = getLatestPendingBatch(
-      order?.order_items || [],
-      station,
-      orderCreatedAt,
-      lastPrinted
-    )
-    if (pending.length === 0) {
-      toast.info('No pending items', `No waiting ${station} items to print.`)
-      return
-    }
-    const stationLabel =
-      station === 'kitchen' ? 'Kitchen — New Items Only' : 'Grill — New Items Only'
-    const ticket: TicketItem[] = pending.map((i) => ({
-      quantity: i.quantity,
-      name:
-        i.menu_items?.name ||
-        (i as unknown as { modifier_notes?: string }).modifier_notes ||
-        'Item',
-      modifier_notes: (i as unknown as { modifier_notes?: string }).modifier_notes || null,
-      unit_price: (i as unknown as { unit_price?: number | null }).unit_price ?? null,
-      total_price:
-        ((i as unknown as { total_price?: number | null }).total_price || 0) +
-        ((i as unknown as { extra_charge?: number | null }).extra_charge || 0),
-    }))
-    const html = buildOrderTicketHTML({
-      station: stationLabel,
-      tableName: table?.name || 'Counter',
-      orderRef: (order?.id || '').slice(0, 8).toUpperCase(),
-      staffName: profile?.full_name || '',
-      items: ticket,
-      createdAt: new Date().toISOString(),
-    })
-    const copies = 2
-    for (let c = 0; c < copies; c++) {
-      const w = window.open('', '_blank', 'width=420,height=640,toolbar=no,menubar=no')
-      if (!w) continue
-      w.document.open('text/html', 'replace')
-      w.document.write(html)
-      w.document.close()
-      w.onload = () =>
-        setTimeout(() => {
-          try {
-            w.print()
-          } catch {
-            /* ignore */
-          } finally {
-            w.close()
-          }
-        }, 150)
-    }
-    // Move marker so subsequent "New" prints only later additions
-    const latestPrintedAt = getStationItemTime(pending[pending.length - 1], orderCreatedAt)
-    if (station === 'kitchen') setLastPrintedKitchenAt(latestPrintedAt)
-    else setLastPrintedGrillAt(latestPrintedAt)
   }
 
   const orderItems = billableItems
@@ -1415,45 +1177,6 @@ export default function PaymentModal({ order: orderProp, table, onSuccess, onClo
           </div>
         </div>
 
-        {/* Station print buttons */}
-        <div className="px-5 pb-3 border-b border-gray-800">
-          <div className="grid grid-cols-4 gap-1.5">
-            <button
-              onClick={() => printAllForStation('kitchen')}
-              className="flex items-center justify-center gap-1 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-[11px] font-medium py-2 rounded-lg border border-gray-700 transition-colors"
-            >
-              Kitchen ({kitchenTotalCount})
-            </button>
-            <button
-              onClick={() => printPendingForStation('kitchen')}
-              className={`flex items-center justify-center gap-1 text-[11px] font-bold py-2 rounded-lg border transition-colors ${kitchenPendingCount > 0 ? 'bg-emerald-600 text-white border-emerald-500 hover:bg-emerald-500' : 'bg-emerald-900/30 text-emerald-400 border-emerald-800 hover:bg-emerald-800/40'}`}
-            >
-              Kitchen New{' '}
-              {kitchenPendingCount > 0 && (
-                <span className="bg-white text-emerald-700 text-[10px] font-black px-1.5 rounded-full ml-0.5">
-                  {kitchenPendingCount}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => printAllForStation('griller')}
-              className="flex items-center justify-center gap-1 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-[11px] font-medium py-2 rounded-lg border border-gray-700 transition-colors"
-            >
-              Grill ({grillTotalCount})
-            </button>
-            <button
-              onClick={() => printPendingForStation('griller')}
-              className={`flex items-center justify-center gap-1 text-[11px] font-bold py-2 rounded-lg border transition-colors ${grillPendingCount > 0 ? 'bg-amber-600 text-white border-amber-500 hover:bg-amber-500' : 'bg-amber-900/30 text-amber-400 border-amber-800 hover:bg-amber-800/40'}`}
-            >
-              Grill New{' '}
-              {grillPendingCount > 0 && (
-                <span className="bg-white text-amber-700 text-[10px] font-black px-1.5 rounded-full ml-0.5">
-                  {grillPendingCount}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
         <div className="p-5 space-y-5">
           <div className="bg-gray-800 rounded-xl p-4">
             <p className="text-gray-400 text-xs mb-3 uppercase tracking-wide">Order Summary</p>

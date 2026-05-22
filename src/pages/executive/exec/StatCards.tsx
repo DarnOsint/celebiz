@@ -1,6 +1,14 @@
-import { TrendingUp, ShoppingBag, LayoutDashboard, BedDouble, Users, Package } from 'lucide-react'
+import { TrendingUp, ShoppingBag, LayoutDashboard, Users, Package } from 'lucide-react'
 import { formatPrice } from '../../../lib/currency'
-import type { Stats } from './types'
+
+interface Stats {
+  revenue: number
+  openOrders: number
+  occupiedTables: number
+  totalTables: number
+  staffOnDuty: number
+  lowStock: number
+}
 
 interface Props {
   stats: Stats
@@ -28,13 +36,6 @@ export default function StatCards({ stats }: Props) {
       icon: LayoutDashboard,
       color: 'text-blue-400',
       bg: 'bg-blue-400/10',
-    },
-    {
-      label: 'Occupied Rooms',
-      value: `${stats.occupiedRooms}/${stats.totalRooms}`,
-      icon: BedDouble,
-      color: 'text-purple-400',
-      bg: 'bg-purple-400/10',
     },
     {
       label: 'Staff On Duty',

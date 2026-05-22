@@ -93,7 +93,6 @@ const statusConfig = {
 }
 const debtTypeLabels: Record<string, string> = {
   table_order: 'Table Order',
-  room_stay: 'Room Stay',
   bar_tab: 'Bar Tab',
 }
 

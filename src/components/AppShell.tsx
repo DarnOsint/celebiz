@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import SyncIndicator from './SyncIndicator'
 import { requestPushPermission } from '../hooks/usePushNotifications'
-import OfflineBanner from './OfflineBanner'
 import { supabase } from '../lib/supabase'
 import {
   LayoutDashboard,
   ShoppingBag,
   TrendingUp,
   Package,
-  BedDouble,
   Settings,
   LogOut,
   Beer,
@@ -21,7 +18,6 @@ import {
   BookOpen,
   Menu,
   X,
-  BarChart2,
   ChevronDown,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -36,10 +32,8 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
   owner: [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/executive' },
     { label: 'Reports', icon: TrendingUp, path: '/reports' },
-    { label: 'Analytics', icon: BarChart2, path: '/analytics' },
     { label: 'Back Office', icon: Settings, path: '/backoffice' },
     { label: 'Month End', icon: CalendarDays, path: '/month-end' },
-    { label: 'Rooms', icon: BedDouble, path: '/apartment' },
   ],
   manager: [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/management' },
@@ -51,18 +45,15 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
   accountant: [
     { label: 'Accounting', icon: BookOpen, path: '/accounting' },
     { label: 'Reports', icon: TrendingUp, path: '/reports' },
-    { label: 'Analytics', icon: BarChart2, path: '/analytics' },
     { label: 'Debtors', icon: Package, path: '/debtors' },
     { label: 'Month End', icon: CalendarDays, path: '/month-end' },
   ],
   auditor: [
     { label: 'Accounting', icon: BookOpen, path: '/accounting' },
     { label: 'Reports', icon: TrendingUp, path: '/reports' },
-    { label: 'Analytics', icon: BarChart2, path: '/analytics' },
     { label: 'Debtors', icon: Package, path: '/debtors' },
     { label: 'Month End', icon: CalendarDays, path: '/month-end' },
   ],
-  apartment_manager: [{ label: 'Rooms', icon: BedDouble, path: '/apartment' }],
   supervisor: [{ label: 'Supervisor', icon: LayoutDashboard, path: '/supervisor' }],
   mixologist: [{ label: 'Mixologist', icon: Beer, path: '/kds/mixologist' }],
 }
@@ -225,7 +216,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="app-shell-root flex flex-col h-screen bg-gray-950 overflow-hidden">
-      <OfflineBanner />
       <div className="app-shell-body flex flex-1 overflow-hidden">
         {/* Desktop sidebar */}
         <aside className="app-shell-sidebar hidden lg:flex flex-col w-56 xl:w-64 bg-gray-900 border-r border-gray-800 flex-shrink-0">
@@ -252,7 +242,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <TableWidget tables={tables} />
           )}
           <div className="px-3 py-3 border-t border-gray-800 space-y-2">
-            <SyncIndicator />
             {notifPermission !== 'granted' && (
               <button
                 onClick={handleEnableNotifications}
@@ -302,7 +291,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             )
           })}
           <div className="flex-1" />
-          <SyncIndicator compact />
           <button
             onClick={signOut}
             title="Sign out"
@@ -322,7 +310,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <span className="text-white font-bold text-sm">Celebiz</span>
             </div>
             <div className="flex items-center gap-2">
-              <SyncIndicator compact />
               {navItems.length > 1 && (
                 <button
                   onClick={() => setDrawerOpen(true)}

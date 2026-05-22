@@ -16,7 +16,6 @@ import {
   Banknote,
   CreditCard,
   BarChart2,
-  Home,
   AlertTriangle,
   RefreshCw,
   Printer,
@@ -109,7 +108,6 @@ interface AttendanceEntry {
   staff_name?: string
   role?: string
   duration_minutes?: number
-  pos_machine?: string | null
 }
 interface PaidOrder {
   id: string
@@ -129,7 +127,6 @@ interface Report {
   grossRevenue: number
   netRevenue: number
   totalExpenses: number
-  roomRevenue: number
   totalRevenue: number
   totalOrders: number
   totalCovers: number
@@ -150,7 +147,6 @@ interface Report {
   totalDebt: number
   totalDebtCreated: number
   debtorCount: number
-  roomStayCount: number
   totalOpeningFloat: number
   totalClosingFloat: number
   byOrderType: { table: number; cash_sale: number; takeaway: number }
@@ -251,7 +247,6 @@ export default function Reports() {
         payoutsRes,
         tillRes,
         debtorsRes,
-        roomStaysRes,
         voidsRes,
         attendanceRes,
         returnsRes,
@@ -277,7 +272,6 @@ export default function Reports() {
           .gte('opened_at', start)
           .lte('opened_at', end),
         supabase.from('debtors').select('*').gte('created_at', start).lte('created_at', end),
-        supabase.from('room_stays').select('*').gte('created_at', start).lte('created_at', end),
         supabase.from('void_log').select('*').gte('created_at', start).lte('created_at', end),
         supabase.from('attendance').select('*').gte('clock_in', start).lte('clock_in', end),
         supabase
@@ -315,7 +309,6 @@ export default function Reports() {
         current_balance?: number
         credit_limit?: number
       }[]
-      const roomStays = (roomStaysRes.data || []) as { status?: string; total_amount?: number }[]
       const voids = (voidsRes.data || []) as VoidEntry[]
       const attendance = (attendanceRes.data || []) as AttendanceEntry[]
       const returnsData = (returnsRes.data || []) as Array<{
@@ -354,9 +347,6 @@ export default function Reports() {
 
       const grossRevenue = Object.values(perOrderNet).reduce((s, v) => s + v, 0)
       const totalExpenses = payouts.reduce((s, p) => s + (p.amount || 0), 0)
-      const roomRevenue = roomStays
-        .filter((r) => r.status === 'checked_out')
-        .reduce((s, r) => s + (r.total_amount || 0), 0)
       // Payment aggregation
       const paymentTotals: Record<string, number> = {}
       // Group payment methods properly (handles transfer:BankName, cash+transfer:X+Y, cash+card:X+Y)
@@ -451,8 +441,7 @@ export default function Reports() {
         grossRevenue,
         netRevenue: grossRevenue - totalExpenses,
         totalExpenses,
-        roomRevenue,
-        totalRevenue: grossRevenue + roomRevenue,
+        totalRevenue: grossRevenue,
         totalOrders: orders.length,
         totalCovers: paidOrders.reduce((s, o) => s + (o.covers || 0), 0),
         revenuePerCover: (() => {
@@ -475,7 +464,6 @@ export default function Reports() {
         totalDebt: debtors.reduce((s, d) => s + (d.current_balance || 0), 0),
         totalDebtCreated: debtors.reduce((s, d) => s + (d.credit_limit || 0), 0),
         debtorCount: debtors.length,
-        roomStayCount: roomStays.length,
         totalOpeningFloat: tillSessions.reduce((s, t) => s + (t.opening_float || 0), 0),
         totalClosingFloat: tillSessions
           .filter((t) => t.status === 'closed')
@@ -513,8 +501,7 @@ export default function Reports() {
       ['Generated:', report.generatedAt],
       [],
       ['REVENUE SUMMARY'],
-      ['Gross Revenue (F&B)', formatPrice(report.grossRevenue)],
-      ['Room Revenue', formatPrice(report.roomRevenue)],
+      ['Gross Revenue', formatPrice(report.grossRevenue)],
       ['Total Revenue', formatPrice(report.totalRevenue)],
       ['Total Expenses', formatPrice(report.totalExpenses)],
       ['Net Revenue', formatPrice(report.netRevenue)],
@@ -561,8 +548,7 @@ export default function Reports() {
         ['Generated', report.generatedAt],
         [],
         ['Metric', 'Value'],
-        ['Gross Revenue (F&B)', report.grossRevenue],
-        ['Room Revenue', report.roomRevenue],
+        ['Gross Revenue', report.grossRevenue],
         ['Total Revenue', report.totalRevenue],
         ['Total Expenses', report.totalExpenses],
         ['Net Revenue', report.netRevenue],
@@ -620,7 +606,6 @@ export default function Reports() {
       ['Metric', 'Value'],
       [
         ['Gross Revenue', formatPrice(r.grossRevenue)],
-        ['Room Revenue', formatPrice(r.roomRevenue)],
         ['Total Expenses', formatPrice(r.totalExpenses)],
         ['Net Revenue', formatPrice(r.netRevenue)],
         ['Total Orders', String(r.totalOrders)],
@@ -658,7 +643,7 @@ export default function Reports() {
                   id: 'rep-daily',
                   title: 'Daily Report',
                   description:
-                    'Full trading summary for any selected day — total and net revenue, cash/POS/transfer breakdown, order count, top-selling items, per-waitron performance (including POS machine assigned), void log, room stay revenue, and payout deductions.',
+                    'Full trading summary for any selected day — total and net revenue, cash/transfer breakdown, order count, top-selling items, per-waitron performance, void log, and payout deductions.',
                 },
                 {
                   id: 'rep-monthly',
@@ -682,7 +667,7 @@ export default function Reports() {
                   id: 'rep-attendance',
                   title: 'Attendance in Reports',
                   description:
-                    'Each report includes the attendance log for the period — staff name, role, shift duration, and POS machine assigned. Use this to match each waitron to their terminal for reconciliation.',
+                    'Each report includes the attendance log for the period — staff name, role, and shift duration.',
                 },
                 {
                   id: 'rep-export',
@@ -833,16 +818,10 @@ export default function Reports() {
               {(
                 [
                   {
-                    label: 'Gross F&B Revenue',
+                    label: 'Gross Revenue',
                     value: formatPrice(report.grossRevenue),
                     color: 'text-amber-400',
                     icon: TrendingUp,
-                  },
-                  {
-                    label: 'Room Revenue',
-                    value: formatPrice(report.roomRevenue),
-                    color: 'text-blue-400',
-                    icon: Home,
                   },
                   {
                     label: 'Total Expenses',
@@ -1259,23 +1238,6 @@ export default function Reports() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
                 <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <Home size={16} className="text-amber-400" /> Room Revenue
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gray-800 rounded-xl p-4">
-                    <p className="text-gray-400 text-xs">Room Stays</p>
-                    <p className="text-white font-bold text-2xl">{report.roomStayCount}</p>
-                  </div>
-                  <div className="bg-gray-800 rounded-xl p-4">
-                    <p className="text-gray-400 text-xs">Revenue</p>
-                    <p className="text-amber-400 font-bold text-xl">
-                      {formatPrice(report.roomRevenue)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
                   <AlertTriangle size={16} className="text-amber-400" /> Debtor Summary
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -1576,7 +1538,7 @@ export default function Reports() {
                         (report.attendance || []).map((a, i) => (
                           <div key={i} className="flex justify-between my-1 text-xs">
                             <span>
-                              {a.staff_name} ({a.role}){a.pos_machine ? ` — ${a.pos_machine}` : ''}
+                              {a.staff_name} ({a.role})
                             </span>
                             <span>
                               {a.duration_minutes
