@@ -267,7 +267,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
     <img src="${qrUrl}" width="90" height="90" alt="QR" style="display:block;margin:0 auto;" onload="window._qrLoaded=true" />
     <div class="qr-label">Scan to view your order online</div>
   </div>
-  <div class="footer">Thank you for visiting Celebiz!</div>
+  <div class="footer">Thank you for visiting Cbiz!</div>
 </body>
 </html>`
   }
@@ -583,7 +583,7 @@ body { font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #
                   <div>Thank you for visiting!</div>
                   <div style={{ color: '#666' }}>Please come again 🙏</div>
                   <div style={{ marginTop: '4px', fontSize: '9px', color: '#888' }}>
-                    Powered by CelebizOS
+                    Powered by CbizOS
                   </div>
                 </div>
                 <div style={{ marginTop: '16px' }} />

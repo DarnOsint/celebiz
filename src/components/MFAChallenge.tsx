@@ -41,7 +41,7 @@ export default function MFAChallenge({ user: _user, profile, onVerified, onSignO
     } else {
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
-        friendlyName: 'CelebizOS',
+        friendlyName: 'CbizOS',
       })
       if (error) {
         setError(error.message)

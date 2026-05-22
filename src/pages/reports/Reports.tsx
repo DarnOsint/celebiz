@@ -535,7 +535,7 @@ export default function Reports() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'celebiz-' + report.period.toLowerCase().replace(/ /g, '-') + '.csv'
+    a.download = 'cbiz-' + report.period.toLowerCase().replace(/ /g, '-') + '.csv'
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -585,7 +585,7 @@ export default function Reports() {
       const ws = XLSX.utils.aoa_to_sheet(data)
       XLSX.utils.book_append_sheet(wb, ws, name.slice(0, 31))
     })
-    const fname = `celebiz_${report.period.replace(/\s+/g, '_')}.xlsx`
+    const fname = `cbiz_${report.period.replace(/\s+/g, '_')}.xlsx`
     XLSX.writeFile(wb, fname)
   }
 
@@ -1570,9 +1570,9 @@ export default function Reports() {
 
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center">
               <p className="text-gray-500 text-xs">
-                Celebiz · {report.period} Report · Generated {report.generatedAt}
+                Cbiz · {report.period} Report · Generated {report.generatedAt}
               </p>
-              <p className="text-gray-600 text-xs mt-1">Powered by CelebizOS</p>
+              <p className="text-gray-600 text-xs mt-1">Powered by CbizOS</p>
             </div>
           </div>
         )}

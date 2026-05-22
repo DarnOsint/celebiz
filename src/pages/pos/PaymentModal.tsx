@@ -590,7 +590,7 @@ export default function PaymentModal({ order: orderProp, table, onSuccess, onClo
       ...bankLines,
       '',
       centre('Thank you for visiting'),
-      centre('Celebiz'),
+      centre('Cbiz'),
       '',
     ].join('\n')
 

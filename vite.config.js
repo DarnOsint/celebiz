@@ -22,9 +22,9 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw-custom.ts',
       manifest: {
-        name: "Celebiz",
-        short_name: 'CelebizOS',
-        description: 'Restaurant management system for Celebiz Lounge',
+        name: "Cbiz",
+        short_name: 'CbizOS',
+        description: 'Restaurant management system for Cbiz Lounge',
         theme_color: '#0F172A',
         background_color: '#0F172A',
         display: 'standalone',

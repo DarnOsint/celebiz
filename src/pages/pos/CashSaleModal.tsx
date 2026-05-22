@@ -482,7 +482,7 @@ export default function CashSaleModal({ type, menuItems, staffId, onSuccess, onC
       centre('** PAYMENT CONFIRMED **'),
       '',
       centre('Thank you for visiting'),
-      centre('Celebiz!'),
+      centre('Cbiz!'),
       '',
     ].join('\n')
 

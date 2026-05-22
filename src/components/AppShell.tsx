@@ -224,8 +224,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <Beer size={16} className="text-black" />
             </div>
             <div className="min-w-0">
-              <p className="text-white font-bold text-sm truncate">Celebiz</p>
-              <p className="text-gray-400 text-xs">CelebizOS</p>
+              <p className="text-white font-bold text-sm truncate">Cbiz</p>
+              <p className="text-gray-400 text-xs">CbizOS</p>
             </div>
           </div>
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
@@ -307,7 +307,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center">
                 <Beer size={13} className="text-black" />
               </div>
-              <span className="text-white font-bold text-sm">Celebiz</span>
+              <span className="text-white font-bold text-sm">Cbiz</span>
             </div>
             <div className="flex items-center gap-2">
               {navItems.length > 1 && (
